@@ -20,158 +20,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import base64
 from io import BytesIO
-from werkzeug.utils import secure_filename
-import threading
-import logging
-import logging.handlers
-import traceback
-import sys
-
-# Configure logging
-def setup_logging():
-    """Configure the logging system for the application."""
-    log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
-    os.makedirs(log_dir, exist_ok=True)
-    
-    # Create a logger
-    logger = logging.getLogger('diamond_app')
-    logger.setLevel(logging.DEBUG)
-    
-    # Create handlers
-    # Console handler for development
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
-    
-    # File handler for all logs
-    file_handler = logging.handlers.RotatingFileHandler(
-        os.path.join(log_dir, 'diamond_app.log'),
-        maxBytes=10485760,  # 10MB
-        backupCount=10
-    )
-    file_handler.setLevel(logging.DEBUG)
-    
-    # Error file handler for errors only
-    error_file_handler = logging.handlers.RotatingFileHandler(
-        os.path.join(log_dir, 'error.log'),
-        maxBytes=10485760,  # 10MB
-        backupCount=10
-    )
-    error_file_handler.setLevel(logging.ERROR)
-    
-    # Create formatters
-    console_formatter = logging.Formatter('%(levelname)s - %(message)s')
-    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
-    # Add formatters to handlers
-    console_handler.setFormatter(console_formatter)
-    file_handler.setFormatter(file_formatter)
-    error_file_handler.setFormatter(file_formatter)
-    
-    # Add handlers to logger
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-    logger.addHandler(error_file_handler)
-    
-    return logger
-
-# Initialize logger
-logger = setup_logging()
-logger.info("Starting Diamond Accounting Application")
 
 app = Flask(__name__)
 app.secret_key = 'diamond_business_secret_key'
-
-# Add global error handlers
-@app.errorhandler(404)
-def page_not_found(e):
-    logger.info(f"404 error: {request.path}")
-    return render_template('error.html', 
-                          error_code=404, 
-                          error_message="The page you're looking for doesn't exist."), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    logger.error(f"500 error: {str(e)}")
-    logger.error(f"Request: {request.path} {request.method}")
-    logger.error(f"Form data: {request.form}")
-    return render_template('error.html', 
-                          error_code=500, 
-                          error_message="Something went wrong on our end. Please try again later."), 500
-
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # Get the exception info
-    exc_info = sys.exc_info()
-    
-    # Format the traceback
-    tb_lines = traceback.format_exception(*exc_info)
-    tb_text = ''.join(tb_lines)
-    
-    # Log the error with traceback
-    logger.error(f"Unhandled exception: {str(e)}")
-    logger.error(f"Request: {request.path} {request.method}")
-    logger.error(f"Form data: {request.form}")
-    logger.error(f"Traceback: {tb_text}")
-    
-    # Return a user-friendly error page
-    return render_template('error.html', 
-                          error_code=500, 
-                          error_message="An unexpected error occurred. Our team has been notified."), 500
-
-# Add custom Jinja2 filters
-@app.template_filter('format_currency')
-def format_currency(value):
-    if value is None:
-        return "0.00"
-    try:
-        value = float(value)
-        return "{:,.2f}".format(value)
-    except (ValueError, TypeError):
-        return "0.00"
-
-@app.template_filter('format_datetime')
-def format_datetime(timestamp):
-    """Format a timestamp into a readable date and time."""
-    try:
-        dt = datetime.fromtimestamp(timestamp)
-        return dt.strftime('%Y-%m-%d %H:%M:%S')
-    except (ValueError, TypeError):
-        return "Unknown"
-
-@app.template_filter('format_size')
-def format_size(size_bytes):
-    """Format a file size in bytes to a human-readable format."""
-    try:
-        size_bytes = float(size_bytes)
-        if size_bytes < 1024:
-            return f"{size_bytes:.2f} B"
-        elif size_bytes < 1024 * 1024:
-            return f"{size_bytes / 1024:.2f} KB"
-        elif size_bytes < 1024 * 1024 * 1024:
-            return f"{size_bytes / (1024 * 1024):.2f} MB"
-        else:
-            return f"{size_bytes / (1024 * 1024 * 1024):.2f} GB"
-    except (ValueError, TypeError):
-        return "Unknown"
-
-@app.template_filter('file_stats')
-def file_stats(file_path):
-    """Get file statistics."""
-    try:
-        if os.path.exists(file_path):
-            stats = os.stat(file_path)
-            return {
-                'size': stats.st_size,
-                'mtime': stats.st_mtime,
-                'ctime': stats.st_ctime
-            }
-        return {'size': 0, 'mtime': 0, 'ctime': 0}
-    except Exception:
-        return {'size': 0, 'mtime': 0, 'ctime': 0}
-
-# Add min and max functions to Jinja2 environment
-app.jinja_env.globals.update(min=min)
-app.jinja_env.globals.update(max=max)
 
 # Ensure data directory exists
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
@@ -181,234 +32,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 PURCHASES_FILE = os.path.join(DATA_DIR, 'purchases.xlsx')
 SALES_FILE = os.path.join(DATA_DIR, 'sales.xlsx')
 PAYMENTS_FILE = os.path.join(DATA_DIR, 'payments.xlsx')
-INVENTORY_FILE = os.path.join(DATA_DIR, 'inventory.xlsx')
-ROUGH_INVENTORY_FILE = os.path.join(DATA_DIR, 'rough_inventory.xlsx')
-
-# Define backup directory
-BACKUP_DIR = os.path.join(DATA_DIR, 'backup')
-os.makedirs(BACKUP_DIR, exist_ok=True)
-
-# Function to create a backup of all data files
-def create_backup():
-    """
-    Create a backup of all data files in a zip file.
-    Returns the path to the created backup file.
-    """
-    try:
-        logger.info("Creating backup of all data files")
-        
-        # Create a timestamp for the backup file
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_file = os.path.join(BACKUP_DIR, f'diamond_data_backup_{timestamp}.zip')
-        logger.debug(f"Backup file path: {backup_file}")
-        
-        # Check if all required files exist
-        missing_files = []
-        for file_path in [PURCHASES_FILE, SALES_FILE, PAYMENTS_FILE, INVENTORY_FILE, ROUGH_INVENTORY_FILE]:
-            if not os.path.exists(file_path):
-                missing_files.append(os.path.basename(file_path))
-        
-        if missing_files:
-            logger.warning(f"The following files are missing and will not be included in the backup: {', '.join(missing_files)}")
-        
-        # Create a zip file containing all data files
-        with zipfile.ZipFile(backup_file, 'w') as zipf:
-            for file_path in [PURCHASES_FILE, SALES_FILE, PAYMENTS_FILE, INVENTORY_FILE, ROUGH_INVENTORY_FILE]:
-                if os.path.exists(file_path):
-                    zipf.write(file_path, os.path.basename(file_path))
-                    logger.debug(f"Added file to backup: {os.path.basename(file_path)}")
-        
-        # Keep only the 10 most recent backups
-        backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR) 
-                              if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
-                             key=os.path.getmtime, reverse=True)
-        
-        for old_backup in backup_files[10:]:
-            try:
-                os.remove(old_backup)
-                logger.debug(f"Removed old backup: {os.path.basename(old_backup)}")
-            except Exception as e:
-                logger.warning(f"Could not remove old backup {old_backup}: {str(e)}")
-        
-        logger.info(f"Backup created successfully: {os.path.basename(backup_file)}")
-        return backup_file
-    except Exception as e:
-        logger.error(f"Error creating backup: {str(e)}")
-        # Log the traceback
-        exc_info = sys.exc_info()
-        tb_lines = traceback.format_exception(*exc_info)
-        tb_text = ''.join(tb_lines)
-        logger.error(f"Traceback: {tb_text}")
-        return None
-
-# Function to restore from a backup file
-def restore_from_backup(backup_file):
-    """
-    Restore data from a backup zip file.
-    """
-    try:
-        logger.info(f"Restoring from backup: {os.path.basename(backup_file)}")
-        
-        # Validate the backup file
-        if not os.path.exists(backup_file):
-            logger.error(f"Backup file does not exist: {backup_file}")
-            return False
-            
-        # Verify it's a valid zip file
-        try:
-            with zipfile.ZipFile(backup_file, 'r') as zipf:
-                # Check if the zip file contains the expected files
-                file_list = zipf.namelist()
-                logger.debug(f"Files in backup: {', '.join(file_list)}")
-                
-                expected_files = [os.path.basename(f) for f in 
-                                 [PURCHASES_FILE, SALES_FILE, PAYMENTS_FILE, INVENTORY_FILE, ROUGH_INVENTORY_FILE]]
-                missing_files = [f for f in expected_files if f not in file_list]
-                
-                if missing_files:
-                    logger.warning(f"The following files are missing from the backup: {', '.join(missing_files)}")
-                    # Proceed anyway, but warn the user
-        except zipfile.BadZipFile:
-            logger.error(f"{backup_file} is not a valid zip file")
-            return False
-            
-        # Create backup of current data before restoring
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        pre_restore_backup = os.path.join(BACKUP_DIR, f'pre_restore_backup_{timestamp}.zip')
-        try:
-            with zipfile.ZipFile(pre_restore_backup, 'w') as zipf:
-                for file_path in [PURCHASES_FILE, SALES_FILE, PAYMENTS_FILE, INVENTORY_FILE, ROUGH_INVENTORY_FILE]:
-                    if os.path.exists(file_path):
-                        zipf.write(file_path, os.path.basename(file_path))
-            logger.info(f"Created pre-restore backup: {os.path.basename(pre_restore_backup)}")
-        except Exception as e:
-            logger.warning(f"Could not create pre-restore backup: {str(e)}")
-            # Continue with restore even if pre-restore backup fails
-        
-        # Create a temporary directory for extraction
-        with tempfile.TemporaryDirectory() as temp_dir:
-            logger.debug(f"Created temporary directory for extraction: {temp_dir}")
-            
-            # Extract the backup file
-            with zipfile.ZipFile(backup_file, 'r') as zipf:
-                zipf.extractall(temp_dir)
-                logger.debug(f"Extracted backup to temporary directory")
-            
-            # Copy the extracted files to the data directory
-            for file_name in os.listdir(temp_dir):
-                src_path = os.path.join(temp_dir, file_name)
-                dst_path = os.path.join(DATA_DIR, file_name)
-                shutil.copy2(src_path, dst_path)
-                logger.debug(f"Copied {file_name} to data directory")
-        
-        # Validate the restored data
-        try:
-            logger.info("Validating restored data")
-            fix_data_types()
-            validate_data_consistency()
-            logger.info("Data validation successful after restore")
-        except Exception as e:
-            logger.warning(f"Data validation after restore encountered issues: {str(e)}")
-            # Continue anyway, the data might still be usable
-        
-        logger.info("Restore completed successfully")
-        return True
-    except Exception as e:
-        logger.error(f"Error restoring from backup: {str(e)}")
-        # Log the traceback
-        exc_info = sys.exc_info()
-        tb_lines = traceback.format_exception(*exc_info)
-        tb_text = ''.join(tb_lines)
-        logger.error(f"Traceback: {tb_text}")
-        return False
-
-# Function to fix data type inconsistencies in Excel files
-def fix_data_types():
-    """
-    Fix data type inconsistencies in Excel files.
-    Ensures that numeric columns are stored as appropriate numeric types.
-    """
-    try:
-        # Fix inventory.xlsx
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            if not inventory_df.empty:
-                # Convert numeric columns to appropriate types
-                numeric_columns = ['carats', 'purchase_price', 'market_value']
-                for col in numeric_columns:
-                    if col in inventory_df.columns:
-                        inventory_df[col] = pd.to_numeric(inventory_df[col], errors='coerce')
-                
-                # Save the fixed DataFrame
-                inventory_df.to_excel(INVENTORY_FILE, index=False)
-                print(f"Fixed data types in {INVENTORY_FILE}")
-        
-        # Fix rough_inventory.xlsx
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            if not rough_inventory_df.empty:
-                # Convert numeric columns to appropriate types
-                numeric_columns = ['weight', 'pieces', 'purchase_price']
-                for col in numeric_columns:
-                    if col in rough_inventory_df.columns:
-                        rough_inventory_df[col] = pd.to_numeric(rough_inventory_df[col], errors='coerce')
-                
-                # Ensure required columns exist
-                required_columns = ['rough_id', 'kapan_no', 'shape_category']
-                for col in required_columns:
-                    if col not in rough_inventory_df.columns:
-                        rough_inventory_df[col] = ''
-                
-                # Save the fixed DataFrame
-                rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                print(f"Fixed data types in {ROUGH_INVENTORY_FILE}")
-        
-        # Fix purchases.xlsx
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-            if not purchases_df.empty:
-                # Convert numeric columns to appropriate types
-                numeric_columns = ['amount', 'Carat', 'Price Per Carat', 'Total Amount']
-                for col in numeric_columns:
-                    if col in purchases_df.columns:
-                        purchases_df[col] = pd.to_numeric(purchases_df[col], errors='coerce')
-                
-                # Save the fixed DataFrame
-                purchases_df.to_excel(PURCHASES_FILE, index=False)
-                print(f"Fixed data types in {PURCHASES_FILE}")
-        
-        # Fix sales.xlsx
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-            if not sales_df.empty:
-                # Convert numeric columns to appropriate types
-                numeric_columns = ['Carat', 'Price Per Carat', 'Total Amount', 'carat', 'price_per_carat', 'total_amount_usd']
-                for col in numeric_columns:
-                    if col in sales_df.columns:
-                        sales_df[col] = pd.to_numeric(sales_df[col], errors='coerce')
-                
-                # Save the fixed DataFrame
-                sales_df.to_excel(SALES_FILE, index=False)
-                print(f"Fixed data types in {SALES_FILE}")
-        
-        # Fix payments.xlsx
-        if os.path.exists(PAYMENTS_FILE):
-            payments_df = pd.read_excel(PAYMENTS_FILE)
-            if not payments_df.empty:
-                # Convert numeric columns to appropriate types
-                numeric_columns = ['total_amount', 'paid_amount', 'pending_amount']
-                for col in numeric_columns:
-                    if col in payments_df.columns:
-                        payments_df[col] = pd.to_numeric(payments_df[col], errors='coerce')
-                
-                # Save the fixed DataFrame
-                payments_df.to_excel(PAYMENTS_FILE, index=False)
-                print(f"Fixed data types in {PAYMENTS_FILE}")
-        
-        return True
-    except Exception as e:
-        print(f"Error fixing data types: {str(e)}")
-        return False
+INVENTORY_FILE = 'data/inventory.xlsx'
 
 # Function to enhance Excel file formatting
 def enhance_excel_formatting(file_path, sheet_name='Sheet1'):
@@ -1291,207 +915,1503 @@ def initialize_excel_files():
 def index():
     return render_template('index.html')
 
-@app.route('/test')
-def test():
-    return "Hello, World! The application is working."
-
 @app.route('/buy', methods=['GET', 'POST'])
 def buy():
     if request.method == 'POST':
         try:
-            # Get the diamond type from the form
-            diamond_type = request.form.get('diamond_type', 'polished')
-            
-            # Get common form data
+            # Get form data
             date = request.form.get('date') or None
             party = request.form.get('party') or None
-            notes = request.form.get('notes') or None
+            description = request.form.get('description') or None
+            stone_id = request.form.get('stone_id') or None
+            rough_id = request.form.get('rough_id') or None
+            kapan_no = request.form.get('kapan_no') or None
+            platform = request.form.get('platform') or None
             
-            if diamond_type == 'polished':
-                # Process polished diamond purchase
-                stone_id = request.form.get('stone_id') or None
-                platform = request.form.get('platform') or None
-                
-                # Validate numeric fields for polished diamond
-                try:
-                    carat = float(request.form.get('carat_detail', 0))
-                    price_per_carat = float(request.form.get('price_per_carat_inr', 0))
-                    
-                    if carat <= 0:
-                        flash('Carat must be greater than 0', 'danger')
-                        return redirect(url_for('buy'))
-                    
-                    if price_per_carat <= 0:
-                        flash('Price per carat must be greater than 0', 'danger')
-                        return redirect(url_for('buy'))
-                        
-                    # Calculate total price
-                    total_price = carat * price_per_carat
-                    
-                    # Add to polished inventory
-                    if os.path.exists(INVENTORY_FILE):
-                        inventory_df = pd.read_excel(INVENTORY_FILE)
-                    else:
-                        inventory_df = pd.DataFrame(columns=['id', 'description', 'shape', 'carats', 'color', 'clarity', 'cut', 
-                                                          'purchase_price', 'market_value', 'status', 'location', 'purchase_date', 
-                                                          'notes', 'rough_id'])
-                    
-                    # Generate a unique ID
-                    item_id = f"D{int(time.time())}"
-                    
-                    # Get shape from form
-                    shape = get_shape_from_form(request.form)
-                    
-                    # Create new item
-                    new_item = {
-                        'id': item_id,
-                        'description': request.form.get('description') or f"{shape} {carat}ct Diamond",
-                        'shape': shape,
-                        'carats': carat,
-                        'color': get_color_from_form(request.form),
-                        'clarity': request.form.get('clarity_detail') or '',
-                        'cut': request.form.get('cut_detail') or '',
-                        'purchase_price': total_price,
-                        'market_value': total_price * 1.2,  # 20% markup as default
-                        'status': 'In Stock',
-                        'location': request.form.get('location') or '',
-                        'purchase_date': date,
-                        'notes': notes,
-                        'rough_id': ''
-                    }
-                    
-                    # Add to DataFrame
-                    inventory_df = pd.concat([inventory_df, pd.DataFrame([new_item])], ignore_index=True)
-                    
-                    # Save to Excel
-                    inventory_df.to_excel(INVENTORY_FILE, index=False)
-                    
-                    # Record purchase in purchases.xlsx
-                    if os.path.exists(os.path.join(DATA_DIR, 'purchases.xlsx')):
-                        purchases_df = pd.read_excel(os.path.join(DATA_DIR, 'purchases.xlsx'))
-                    else:
-                        purchases_df = pd.DataFrame(columns=['id', 'date', 'party', 'item_id', 'description', 'amount', 'payment_status', 'notes', 'diamond_type'])
-                    
-                    # Create purchase record
-                    purchase_id = f"P{int(time.time())}"
-                    purchase_record = {
-                        'id': purchase_id,
-                        'date': date,
-                        'party': party,
-                        'item_id': item_id,
-                        'description': new_item['description'],
-                        'amount': total_price,
-                        'payment_status': request.form.get('payment_status') or 'Pending',
-                        'notes': notes,
-                        'diamond_type': 'polished'
-                    }
-                    
-                    purchases_df = pd.concat([purchases_df, pd.DataFrame([purchase_record])], ignore_index=True)
-                    purchases_df.to_excel(os.path.join(DATA_DIR, 'purchases.xlsx'), index=False)
-                    
-                    flash(f'Polished diamond purchase recorded successfully! Added to inventory with ID: {item_id}', 'success')
-                    
-                except (ValueError, TypeError) as e:
-                    flash(f'Invalid numeric value: {str(e)}', 'danger')
+            # Validate numeric fields
+            try:
+                carat = float(request.form.get('carat'))
+                if carat <= 0:
+                    flash('Carat must be greater than 0', 'danger')
                     return redirect(url_for('buy'))
-                
-            elif diamond_type == 'rough':
-                # Process rough diamond purchase
-                rough_id = request.form.get('rough_id') or None
-                kapan_no = request.form.get('kapan_no') or None
-                source = request.form.get('source') or None
-                origin = request.form.get('origin') or None
-                
-                # Validate numeric fields for rough diamond
-                try:
-                    weight = float(request.form.get('weight', 0))
-                    pieces = int(request.form.get('pieces', 1))
-                    purchase_price = float(request.form.get('purchase_price', 0))
-                    
-                    if weight <= 0:
-                        flash('Weight must be greater than 0', 'danger')
-                        return redirect(url_for('buy'))
-                    
-                    if purchase_price <= 0:
-                        flash('Purchase price must be greater than 0', 'danger')
-                        return redirect(url_for('buy'))
-                    
-                    # Add to rough inventory
-                    if os.path.exists(ROUGH_INVENTORY_FILE):
-                        rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                    else:
-                        rough_inventory_df = pd.DataFrame(columns=['id', 'lot_id', 'description', 'source', 'origin', 
-                                                                'weight', 'pieces', 'purchase_price', 'purchase_date', 
-                                                                'status', 'location', 'notes', 'image_path', 'rough_id', 'kapan_no',
-                                                                'shape_category'])
-                    
-                    # Generate a unique ID and lot ID
-                    item_id = f"R{int(time.time())}"
-                    lot_id = f"LOT-{str(int(time.time()))[-4:]}" if pieces > 1 else ""
-                    
-                    # Create new item
-                    new_item = {
-                        'id': item_id,
-                        'lot_id': lot_id,
-                        'description': request.form.get('description') or f"Rough Diamond {weight}ct",
-                        'source': source,
-                        'origin': origin,
-                        'weight': weight,
-                        'pieces': pieces,
-                        'purchase_price': purchase_price,
-                        'purchase_date': date,
-                        'status': 'In Stock',
-                        'location': request.form.get('location') or '',
-                        'notes': notes,
-                        'image_path': '',
-                        'rough_id': rough_id,
-                        'kapan_no': kapan_no,
-                        'shape_category': get_shape_from_form(request.form, 'rough')
-                    }
-                    
-                    # Add to DataFrame
-                    rough_inventory_df = pd.concat([rough_inventory_df, pd.DataFrame([new_item])], ignore_index=True)
-                    
-                    # Save to Excel
-                    rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                    
-                    # Record purchase in purchases.xlsx
-                    if os.path.exists(os.path.join(DATA_DIR, 'purchases.xlsx')):
-                        purchases_df = pd.read_excel(os.path.join(DATA_DIR, 'purchases.xlsx'))
-                    else:
-                        purchases_df = pd.DataFrame(columns=['id', 'date', 'party', 'item_id', 'description', 'amount', 'payment_status', 'notes', 'diamond_type'])
-                    
-                    # Create purchase record
-                    purchase_id = f"P{int(time.time())}"
-                    purchase_record = {
-                        'id': purchase_id,
-                        'date': date,
-                        'party': party,
-                        'item_id': item_id,
-                        'description': new_item['description'],
-                        'amount': purchase_price,
-                        'payment_status': request.form.get('payment_status') or 'Pending',
-                        'notes': notes,
-                        'diamond_type': 'rough'
-                    }
-                    
-                    purchases_df = pd.concat([purchases_df, pd.DataFrame([purchase_record])], ignore_index=True)
-                    purchases_df.to_excel(os.path.join(DATA_DIR, 'purchases.xlsx'), index=False)
-                    
-                    flash('Rough diamond purchase recorded successfully!', 'success')
-                    
-                except (ValueError, TypeError) as e:
-                    flash(f'Invalid numeric value: {str(e)}', 'danger')
+            except (ValueError, TypeError):
+                flash('Invalid carat value', 'danger')
+                return redirect(url_for('buy'))
+            
+            try:
+                quantity = int(request.form.get('quantity'))
+                if quantity <= 0:
+                    flash('Quantity must be greater than 0', 'danger')
                     return redirect(url_for('buy'))
+            except (ValueError, TypeError):
+                flash('Invalid quantity value', 'danger')
+                return redirect(url_for('buy'))
             
-            return redirect(url_for('buy'))
+            try:
+                price_per_carat = float(request.form.get('price_per_carat'))
+                if price_per_carat <= 0:
+                    flash('Price per carat must be greater than 0', 'danger')
+                    return redirect(url_for('buy'))
+            except (ValueError, TypeError):
+                flash('Invalid price per carat value', 'danger')
+                return redirect(url_for('buy'))
             
+            try:
+                price_per_carat_inr = float(request.form.get('price_per_carat_inr'))
+                if price_per_carat_inr <= 0:
+                    flash('Price per carat (INR) must be greater than 0', 'danger')
+                    return redirect(url_for('buy'))
+            except (ValueError, TypeError):
+                flash('Invalid price per carat (INR) value', 'danger')
+                return redirect(url_for('buy'))
+            
+            # Calculate total amounts
+            total_amount_usd = carat * price_per_carat
+            total_amount_inr = carat * price_per_carat_inr
+            
+            # Payment information
+            payment_status = request.form.get('payment_status')
+            payment_date = request.form.get('payment_date') if payment_status == 'Completed' else None
+            payment_reference = request.form.get('payment_reference') or None
+            payment_due_date = request.form.get('payment_due_date') or None
+            payment_notes = request.form.get('payment_notes') or None
+            
+            # Initialize partial_payments as None
+            partial_payments = None
+            
+            # Create a new purchase record
+            new_purchase = {
+                'date': date,
+                'party': party,
+                'description': description,
+                'stone_id': stone_id,
+                'rough_id': rough_id,
+                'kapan_no': kapan_no,
+                'platform': platform,
+                'carat': carat,
+                'quantity': quantity,
+                'price_per_carat': price_per_carat,
+                'price_per_carat_inr': price_per_carat_inr,
+                'total_amount_usd': total_amount_usd,
+                'total_amount_inr': total_amount_inr,
+                'payment_status': payment_status,
+                'payment_date': payment_date,
+                'payment_reference': payment_reference,
+                'payment_due_date': payment_due_date,
+                'payment_notes': payment_notes,
+                'partial_payments': partial_payments
+            }
+            
+            # Load existing purchases or create a new DataFrame
+            if os.path.exists(PURCHASES_FILE):
+                purchases_df = pd.read_excel(PURCHASES_FILE)
+            else:
+                purchases_df = pd.DataFrame(columns=list(new_purchase.keys()))
+            
+            # Append the new purchase
+            purchases_df = pd.concat([purchases_df, pd.DataFrame([new_purchase])], ignore_index=True)
+            
+            # Save the updated DataFrame
+            purchases_df.to_excel(PURCHASES_FILE, index=False)
+            
+            # Create payment record for purchase
+            if payment_status != 'Completed':
+                try:
+                    # Load existing payments or create new DataFrame
+                    if os.path.exists(PAYMENTS_FILE):
+                        payments_df = pd.read_excel(PAYMENTS_FILE)
+                    else:
+                        payments_df = pd.DataFrame(columns=['id', 'type', 'name', 'total_amount', 'paid_amount', 
+                                                          'pending_amount', 'status', 'payment_date', 
+                                                          'payment_method', 'notes', 'reference_id', 'reference_type'])
+                    
+                    # Generate new payment ID
+                    new_id = str(len(payments_df) + 1)
+                    
+                    # Create payment record
+                    new_payment = {
+                        'id': new_id,
+                        'type': 'supplier',
+                        'name': party,
+                        'total_amount': total_amount_inr,
+                        'paid_amount': 0,
+                        'pending_amount': total_amount_inr,
+                        'status': 'pending',
+                        'payment_date': pd.to_datetime(date),
+                        'payment_method': 'pending',
+                        'notes': f"Purchase payment for {description}",
+                        'reference_id': str(len(purchases_df) - 1),  # Index of the new purchase
+                        'reference_type': 'purchase'
+                    }
+                    
+                    # Append new payment
+                    payments_df = pd.concat([payments_df, pd.DataFrame([new_payment])], ignore_index=True)
+                    payments_df.to_excel(PAYMENTS_FILE, index=False)
+                except Exception as e:
+                    print(f"Error creating payment record: {str(e)}")
+            
+            flash('Purchase recorded successfully!', 'success')
+            return redirect(url_for('records'))
+        
         except Exception as e:
-            flash(f'Error processing purchase: {str(e)}', 'danger')
+            flash(f'Error recording purchase: {str(e)}', 'danger')
             return redirect(url_for('buy'))
     
-    # For GET requests, display the buy form
-    return render_template('buy.html', today_date=datetime.now().strftime('%Y-%m-%d'))
+    return render_template('buy.html')
+
+@app.route('/sell', methods=['GET', 'POST'])
+def sell():
+    if request.method == 'POST':
+        try:
+            # Get form data
+            date = request.form.get('date') or None
+            party = request.form.get('party') or None
+            description = request.form.get('description') or None
+            stone_id = request.form.get('stone_id') or None
+            rough_id = request.form.get('rough_id') or None
+            kapan_no = request.form.get('kapan_no') or None
+            platform = request.form.get('platform') or None
+            
+            # Validate numeric fields
+            try:
+                carat = float(request.form.get('carat'))
+                if carat <= 0:
+                    flash('Carat must be greater than 0', 'danger')
+                    return redirect(url_for('sell'))
+            except (ValueError, TypeError):
+                flash('Invalid carat value', 'danger')
+                return redirect(url_for('sell'))
+            
+            try:
+                quantity = int(request.form.get('quantity'))
+                if quantity <= 0:
+                    flash('Quantity must be greater than 0', 'danger')
+                    return redirect(url_for('sell'))
+            except (ValueError, TypeError):
+                flash('Invalid quantity value', 'danger')
+                return redirect(url_for('sell'))
+            
+            try:
+                price_per_carat = float(request.form.get('price_per_carat'))
+                if price_per_carat <= 0:
+                    flash('Price per carat must be greater than 0', 'danger')
+                    return redirect(url_for('sell'))
+            except (ValueError, TypeError):
+                flash('Invalid price per carat value', 'danger')
+                return redirect(url_for('sell'))
+            
+            try:
+                price_per_carat_inr = float(request.form.get('price_per_carat_inr'))
+                if price_per_carat_inr <= 0:
+                    flash('Price per carat (INR) must be greater than 0', 'danger')
+                    return redirect(url_for('sell'))
+            except (ValueError, TypeError):
+                flash('Invalid price per carat (INR) value', 'danger')
+                return redirect(url_for('sell'))
+            
+            # Calculate total amounts
+            total_amount_usd = carat * price_per_carat
+            total_amount_inr = carat * price_per_carat_inr
+            
+            # Payment information
+            payment_status = request.form.get('payment_status')
+            payment_date = request.form.get('payment_date') if payment_status == 'Completed' else None
+            payment_reference = request.form.get('payment_reference') or None
+            payment_due_date = request.form.get('payment_due_date') or None
+            payment_notes = request.form.get('payment_notes') or None
+            
+            # Initialize partial_payments as None
+            partial_payments = None
+            
+            # Create a new sale record
+            new_sale = {
+                'date': date,
+                'party': party,
+                'description': description,
+                'stone_id': stone_id,
+                'rough_id': rough_id,
+                'kapan_no': kapan_no,
+                'platform': platform,
+                'carat': carat,
+                'quantity': quantity,
+                'price_per_carat': price_per_carat,
+                'price_per_carat_inr': price_per_carat_inr,
+                'total_amount_usd': total_amount_usd,
+                'total_amount_inr': total_amount_inr,
+                'payment_status': payment_status,
+                'payment_date': payment_date,
+                'payment_reference': payment_reference,
+                'payment_due_date': payment_due_date,
+                'payment_notes': payment_notes,
+                'partial_payments': partial_payments
+            }
+            
+            # Load existing sales or create a new DataFrame
+            if os.path.exists(SALES_FILE):
+                sales_df = pd.read_excel(SALES_FILE)
+            else:
+                sales_df = pd.DataFrame(columns=list(new_sale.keys()))
+            
+            # Append the new sale
+            sales_df = pd.concat([sales_df, pd.DataFrame([new_sale])], ignore_index=True)
+            
+            # Save the updated DataFrame
+            sales_df.to_excel(SALES_FILE, index=False)
+            
+            # Create payment record for sale
+            if payment_status != 'Completed':
+                try:
+                    # Load existing payments or create new DataFrame
+                    if os.path.exists(PAYMENTS_FILE):
+                        payments_df = pd.read_excel(PAYMENTS_FILE)
+                    else:
+                        payments_df = pd.DataFrame(columns=['id', 'type', 'name', 'total_amount', 'paid_amount', 
+                                                          'pending_amount', 'status', 'payment_date', 
+                                                          'payment_method', 'notes', 'reference_id', 'reference_type'])
+                    
+                    # Generate new payment ID
+                    new_id = str(len(payments_df) + 1)
+                    
+                    # Create payment record
+                    new_payment = {
+                        'id': new_id,
+                        'type': 'customer',
+                        'name': party,
+                        'total_amount': total_amount_inr,
+                        'paid_amount': 0,
+                        'pending_amount': total_amount_inr,
+                        'status': 'pending',
+                        'payment_date': pd.to_datetime(date),
+                        'payment_method': 'pending',
+                        'notes': f"Sale payment for {description}",
+                        'reference_id': str(len(sales_df) - 1),  # Index of the new sale
+                        'reference_type': 'sale'
+                    }
+                    
+                    # Append new payment
+                    payments_df = pd.concat([payments_df, pd.DataFrame([new_payment])], ignore_index=True)
+                    payments_df.to_excel(PAYMENTS_FILE, index=False)
+                except Exception as e:
+                    print(f"Error creating payment record: {str(e)}")
+            
+            flash('Sale recorded successfully!', 'success')
+            return redirect(url_for('records'))
+        
+        except Exception as e:
+            flash(f'Error recording sale: {str(e)}', 'danger')
+            return redirect(url_for('sell'))
+    
+    return render_template('sell.html')
+
+@app.route('/records')
+def records():
+    # Load purchase records
+    if os.path.exists(PURCHASES_FILE):
+        purchases_df = pd.read_excel(PURCHASES_FILE)
+        # Replace NaN values with None for proper handling in templates
+        purchases_df = purchases_df.replace({pd.NA: None, float('nan'): None})
+        purchases = purchases_df.to_dict('records')
+    else:
+        purchases = []
+    
+    # Load sales records
+    if os.path.exists(SALES_FILE):
+        sales_df = pd.read_excel(SALES_FILE)
+        # Replace NaN values with None for proper handling in templates
+        sales_df = sales_df.replace({pd.NA: None, float('nan'): None})
+        sales = sales_df.to_dict('records')
+    else:
+        sales = []
+    
+    return render_template('records.html', purchases=purchases, sales=sales)
+
+@app.route('/reports')
+def reports():
+    """Generate comprehensive business reports and analytics."""
+    # Check if the purchases file exists
+    if not os.path.exists(PURCHASES_FILE):
+        flash('No purchase records found. Please add some purchases first.', 'warning')
+        return redirect(url_for('index'))
+    
+    # Check if the sales file exists
+    if not os.path.exists(SALES_FILE):
+        flash('No sales records found. Please add some sales first.', 'warning')
+        return redirect(url_for('index'))
+    
+    # Load purchases and sales data
+    purchases_df = pd.read_excel(PURCHASES_FILE)
+    sales_df = pd.read_excel(SALES_FILE)
+    
+    try:
+        # Calculate basic metrics
+        total_purchases = purchases_df['Total Amount USD'].sum() if 'Total Amount USD' in purchases_df.columns else 0
+        total_sales = sales_df['Total Amount USD'].sum() if 'Total Amount USD' in sales_df.columns else 0
+        profit = total_sales - total_purchases
+        
+        # Calculate profit percentage - prevent division by zero
+        if total_purchases > 0:
+            profit_percentage = (profit / total_purchases * 100)
+        else:
+            profit_percentage = 0
+            if profit > 0:
+                # If there's profit but no purchases, set to 100%
+                profit_percentage = 100
+        
+        # Calculate volume metrics
+        total_carats_purchased = purchases_df['Carat'].sum() if 'Carat' in purchases_df.columns else 0
+        total_carats_sold = sales_df['Carat'].sum() if 'Carat' in sales_df.columns else 0
+        
+        # Calculate average prices - prevent division by zero
+        if total_carats_purchased > 0:
+            avg_purchase_price = total_purchases / total_carats_purchased
+        else:
+            avg_purchase_price = 0
+            
+        if total_carats_sold > 0:
+            avg_sale_price = total_sales / total_carats_sold
+        else:
+            avg_sale_price = 0
+        
+        # Count transactions
+        purchase_count = len(purchases_df)
+        sales_count = len(sales_df)
+        
+        # Prepare report data
+        report_data = {
+            'total_purchases': total_purchases,
+            'total_sales': total_sales,
+            'profit': profit,
+            'profit_percentage': profit_percentage,
+            'total_carats_purchased': total_carats_purchased,
+            'total_carats_sold': total_carats_sold,
+            'avg_purchase_price': avg_purchase_price,
+            'avg_sale_price': avg_sale_price,
+            'purchase_count': purchase_count,
+            'sales_count': sales_count
+        }
+    except Exception as e:
+        flash(f'Error generating reports: {str(e)}', 'danger')
+        # Provide default values for the report data
+        report_data = {
+            'total_purchases': 0,
+            'total_sales': 0,
+            'profit': 0,
+            'profit_percentage': 0,
+            'total_carats_purchased': 0,
+            'total_carats_sold': 0,
+            'avg_purchase_price': 0,
+            'avg_sale_price': 0,
+            'purchase_count': 0,
+            'sales_count': 0
+        }
+    
+    return render_template('reports.html', report_data=report_data)
+
+@app.route('/dashboard')
+def dashboard():
+    # Check if the purchases file exists
+    if not os.path.exists(PURCHASES_FILE):
+        flash('No purchase records found. Please add some purchases first.', 'warning')
+        return redirect(url_for('index'))
+    
+    # Check if the sales file exists
+    if not os.path.exists(SALES_FILE):
+        flash('No sales records found. Please add some sales first.', 'warning')
+        return redirect(url_for('index'))
+    
+    # Load purchases and sales data
+    try:
+        purchases_df = pd.read_excel(PURCHASES_FILE)
+        sales_df = pd.read_excel(SALES_FILE)
+    except Exception as e:
+        flash(f'Error loading Excel files: {str(e)}', 'danger')
+        return redirect(url_for('index'))
+    
+    # Calculate totals - handle different column name formats
+    try:
+        # Try different possible column names for total amount
+        if 'Total Amount USD' in purchases_df.columns:
+            total_purchases = purchases_df['Total Amount USD'].sum()
+        elif 'Total Amount (USD)' in purchases_df.columns:
+            total_purchases = purchases_df['Total Amount (USD)'].sum()
+        elif 'Total Amount' in purchases_df.columns:
+            total_purchases = purchases_df['Total Amount'].sum()
+        else:
+            # If no matching column is found, use 0
+            flash('Warning: Could not find total amount column in purchases file', 'warning')
+            total_purchases = 0
+        
+        if 'Total Amount USD' in sales_df.columns:
+            total_sales = sales_df['Total Amount USD'].sum()
+        elif 'Total Amount (USD)' in sales_df.columns:
+            total_sales = sales_df['Total Amount (USD)'].sum()
+        elif 'Total Amount' in sales_df.columns:
+            total_sales = sales_df['Total Amount'].sum()
+        else:
+            # If no matching column is found, use 0
+            flash('Warning: Could not find total amount column in sales file', 'warning')
+            total_sales = 0
+        
+        profit = total_sales - total_purchases
+        
+        # Calculate profit percentage with safe division
+        if total_purchases > 0:
+            profit_percentage = (profit / total_purchases) * 100
+        else:
+            # Handle division by zero
+            if profit > 0:
+                # If there's profit but no purchases, set to 100%
+                profit_percentage = 100
+            elif profit < 0:
+                # If there's loss but no purchases, set to -100%
+                profit_percentage = -100
+            else:
+                # If no profit and no purchases, set to 0%
+                profit_percentage = 0
+        
+        # Calculate volume metrics
+        if 'Carat' in purchases_df.columns:
+            total_carats_purchased = purchases_df['Carat'].sum()
+        else:
+            total_carats_purchased = 0
+            
+        if 'Carat' in sales_df.columns:
+            total_carats_sold = sales_df['Carat'].sum()
+        else:
+            total_carats_sold = 0
+            
+        # Count transactions
+        purchase_count = len(purchases_df)
+        sales_count = len(sales_df)
+        
+        # Calculate total pieces
+        total_pcs_purchased = purchases_df['Pcs'].sum() if 'Pcs' in purchases_df.columns else 0
+        total_pcs_sold = sales_df['Pcs'].sum() if 'Pcs' in sales_df.columns else 0
+        
+        # Count payment statuses for purchases
+        if 'Payment Status' in purchases_df.columns:
+            completed_purchase_count = len(purchases_df[purchases_df['Payment Status'] == 'Completed'])
+            pending_purchase_count = len(purchases_df[purchases_df['Payment Status'] == 'Pending'])
+            partial_purchase_count = len(purchases_df[purchases_df['Payment Status'] == 'Partial'])
+        else:
+            completed_purchase_count = 0
+            pending_purchase_count = 0
+            partial_purchase_count = 0
+        
+        # Count payment statuses for sales
+        if 'Payment Status' in sales_df.columns:
+            completed_sale_count = len(sales_df[sales_df['Payment Status'] == 'Completed'])
+            pending_sale_count = len(sales_df[sales_df['Payment Status'] == 'Pending'])
+            partial_sale_count = len(sales_df[sales_df['Payment Status'] == 'Partial'])
+        else:
+            completed_sale_count = 0
+            pending_sale_count = 0
+            partial_sale_count = 0
+        
+    except Exception as e:
+        flash(f'Error calculating dashboard metrics: {str(e)}', 'danger')
+        total_purchases = 0
+        total_sales = 0
+        profit = 0
+        profit_percentage = 0
+        total_carats_purchased = 0
+        total_carats_sold = 0
+        purchase_count = 0
+        sales_count = 0
+        total_pcs_purchased = 0
+        total_pcs_sold = 0
+        completed_purchase_count = 0
+        pending_purchase_count = 0
+        partial_purchase_count = 0
+        completed_sale_count = 0
+        pending_sale_count = 0
+        partial_sale_count = 0
+    
+    return render_template('dashboard.html', 
+                           total_purchases=total_purchases,
+                           total_sales=total_sales,
+                           profit=profit,
+                           profit_percentage=profit_percentage,
+                           total_carats_purchased=total_carats_purchased,
+                           total_carats_sold=total_carats_sold,
+                           purchase_count=purchase_count,
+                           sales_count=sales_count,
+                           total_pcs_purchased=total_pcs_purchased,
+                           total_pcs_sold=total_pcs_sold,
+                           completed_purchase_count=completed_purchase_count,
+                           pending_purchase_count=pending_purchase_count,
+                           partial_purchase_count=partial_purchase_count,
+                           completed_sale_count=completed_sale_count,
+                           pending_sale_count=pending_sale_count,
+                           partial_sale_count=partial_sale_count)
+
+@app.route('/delete_record', methods=['POST'])
+def delete_record():
+    record_type = request.form.get('record_type')
+    record_index = request.form.get('record_index')
+    
+    if not record_type or not record_index:
+        flash('Invalid request', 'danger')
+        return redirect(url_for('records'))
+    
+    try:
+        record_index = int(record_index)
+        
+        if record_type == 'purchase':
+            file_path = PURCHASES_FILE
+        elif record_type == 'sale':
+            file_path = SALES_FILE
+        else:
+            flash('Invalid record type', 'danger')
+            return redirect(url_for('records'))
+        
+        # Load the data
+        if not os.path.exists(file_path):
+            flash('Record file not found', 'danger')
+            return redirect(url_for('records'))
+        
+        df = pd.read_excel(file_path)
+        
+        if record_index < 0 or record_index >= len(df):
+            flash('Record not found', 'danger')
+            return redirect(url_for('records'))
+        
+        # Delete the record
+        df = df.drop(record_index).reset_index(drop=True)
+        
+        # Save the updated dataframe
+        df.to_excel(file_path, index=False)
+        enhance_excel_formatting(file_path)
+        
+        flash('Record deleted successfully!', 'success')
+        
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'danger')
+    
+    return redirect(url_for('records'))
+
+@app.route('/export/<file_type>')
+def export(file_type):
+    try:
+        if file_type == 'purchases':
+            source_file = PURCHASES_FILE
+            filename = 'diamond_purchases.xlsx'
+        elif file_type == 'sales':
+            source_file = SALES_FILE
+            filename = 'diamond_sales.xlsx'
+        else:
+            flash('Invalid file type', 'danger')
+            return redirect(url_for('records'))
+        
+        # Ensure the source file exists
+        if not os.path.exists(source_file):
+            flash(f'Source file not found: {source_file}', 'danger')
+            return redirect(url_for('records'))
+        
+        # Create a temporary directory if it doesn't exist
+        temp_dir = os.path.join(DATA_DIR, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        # Create a unique temporary file path
+        temp_file = os.path.join(temp_dir, f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}")
+        
+        # Read the source file with pandas
+        try:
+            df = pd.read_excel(source_file)
+            
+            # Write to the temporary file
+            with pd.ExcelWriter(temp_file, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='Sheet1')
+                
+            # Enhance the Excel file after it's been properly saved
+            enhance_excel_formatting(temp_file)
+            
+            # Send the file to the user
+            return send_file(
+                temp_file,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+        except Exception as e:
+            # If there's an error with pandas, try a direct file copy
+            import shutil
+            shutil.copy2(source_file, temp_file)
+            
+            # Send the file to the user without enhancement
+            flash(f'Warning: Could not enhance the Excel file. Sending original format.', 'warning')
+            return send_file(
+                temp_file,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            
+    except Exception as e:
+        flash(f'Error exporting file: {str(e)}', 'danger')
+        return redirect(url_for('records'))
+
+@app.route('/debug_excel')
+def debug_excel():
+    """Debug route to display Excel file information."""
+    try:
+        purchases_info = {}
+        sales_info = {}
+        
+        if os.path.exists(PURCHASES_FILE):
+            purchases_df = pd.read_excel(PURCHASES_FILE)
+            purchases_info = {
+                'exists': True,
+                'columns': list(purchases_df.columns),
+                'row_count': len(purchases_df),
+                'file_path': PURCHASES_FILE
+            }
+        else:
+            purchases_info = {
+                'exists': False,
+                'file_path': PURCHASES_FILE
+            }
+            
+        if os.path.exists(SALES_FILE):
+            sales_df = pd.read_excel(SALES_FILE)
+            sales_info = {
+                'exists': True,
+                'columns': list(sales_df.columns),
+                'row_count': len(sales_df),
+                'file_path': SALES_FILE
+            }
+        else:
+            sales_info = {
+                'exists': False,
+                'file_path': SALES_FILE
+            }
+            
+        return render_template('debug_excel.html', 
+                              purchases_info=purchases_info,
+                              sales_info=sales_info)
+    except Exception as e:
+        return f"""
+        <h1>Excel Debug Information</h1>
+        <p style="color: red;">Error: {str(e)}</p>
+        <p>Purchases file path: {PURCHASES_FILE}</p>
+        <p>Sales file path: {SALES_FILE}</p>
+        """
+
+@app.route('/reinitialize_excel', methods=['GET', 'POST'])
+def reinitialize_excel():
+    if request.method == 'POST':
+        try:
+            # Create backup directory if it doesn't exist
+            backup_dir = os.path.join(DATA_DIR, 'backup')
+            os.makedirs(backup_dir, exist_ok=True)
+            
+            # Backup existing files if they exist
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            
+            if os.path.exists(PURCHASES_FILE):
+                backup_file = os.path.join(backup_dir, f'purchases_backup_{timestamp}.xlsx')
+                import shutil
+                shutil.copy2(PURCHASES_FILE, backup_file)
+                flash(f'Backed up purchases file to {backup_file}', 'info')
+            
+            if os.path.exists(SALES_FILE):
+                backup_file = os.path.join(backup_dir, f'sales_backup_{timestamp}.xlsx')
+                import shutil
+                shutil.copy2(SALES_FILE, backup_file)
+                flash(f'Backed up sales file to {backup_file}', 'info')
+            
+            # Create new purchases file
+            purchases_df = pd.DataFrame(columns=[
+                'Date', 'Party', 'Description', 'Stone ID', 'Rough ID', 'Kapan No', 'Platform',
+                'Carat', 'Than', 'Pcs', 'Price Per Carat', 'Price Per Carat INR', 'Rate', 'Total Amount USD', 'Total Amount INR',
+                'Payment Status', 'Reference Party', 'Payment Due Date', 'Payment Days', 'Payment Done Date', 'Notes'
+            ])
+            purchases_df.to_excel(PURCHASES_FILE, index=False)
+            
+            # Create new sales file
+            sales_df = pd.DataFrame(columns=[
+                'Date', 'Party', 'Description', 'Stone ID', 'Rough ID', 'Kapan No', 'Platform',
+                'Carat', 'Than', 'Pcs', 'Price Per Carat', 'Price Per Carat INR', 'Rate', 'Total Amount USD', 'Total Amount INR',
+                'Payment Status', 'Reference Party', 'Payment Due Date', 'Payment Days', 'Payment Done Date', 'Notes'
+            ])
+            sales_df.to_excel(SALES_FILE, index=False)
+            
+            # Apply formatting
+            enhance_excel_formatting(PURCHASES_FILE)
+            enhance_excel_formatting(SALES_FILE)
+            
+            flash('Excel files have been reinitialized successfully!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            flash(f'Error reinitializing Excel files: {str(e)}', 'danger')
+            return redirect(url_for('reinitialize_excel'))
+    
+    return render_template('reinitialize_confirm.html')
+
+@app.route('/edit_record/<record_type>/<int:record_index>', methods=['GET', 'POST'])
+def edit_record(record_type, record_index):
+    if record_type not in ['purchase', 'sale']:
+        flash('Invalid record type.', 'danger')
+        return redirect(url_for('records'))
+    
+    file_path = PURCHASES_FILE if record_type == 'purchase' else SALES_FILE
+    
+    if not os.path.exists(file_path):
+        flash(f'No {record_type} records found.', 'danger')
+        return redirect(url_for('records'))
+    
+    try:
+        df = pd.read_excel(file_path)
+        df = df.replace({pd.NA: None, float('nan'): None})
+        
+        if record_index < 0 or record_index >= len(df):
+            flash('Invalid record index.', 'danger')
+            return redirect(url_for('records'))
+        
+        if request.method == 'POST':
+            try:
+                # Get form data
+                date = request.form.get('date') or None
+                party = request.form.get('party') or None
+                description = request.form.get('description') or None
+                stone_id = request.form.get('stone_id') or None
+                rough_id = request.form.get('rough_id') or None
+                kapan_no = request.form.get('kapan_no') or None
+                platform = request.form.get('platform') or None
+                
+                # Validate numeric fields
+                try:
+                    carat = float(request.form.get('carat'))
+                    if carat <= 0:
+                        flash('Carat must be greater than 0', 'danger')
+                        return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                except (ValueError, TypeError):
+                    flash('Invalid carat value', 'danger')
+                    return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                
+                try:
+                    quantity = int(request.form.get('quantity'))
+                    if quantity <= 0:
+                        flash('Quantity must be greater than 0', 'danger')
+                        return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                except (ValueError, TypeError):
+                    flash('Invalid quantity value', 'danger')
+                    return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                
+                try:
+                    price_per_carat = float(request.form.get('price_per_carat'))
+                    if price_per_carat <= 0:
+                        flash('Price per carat must be greater than 0', 'danger')
+                        return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                except (ValueError, TypeError):
+                    flash('Invalid price per carat value', 'danger')
+                    return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                
+                try:
+                    price_per_carat_inr = float(request.form.get('price_per_carat_inr'))
+                    if price_per_carat_inr <= 0:
+                        flash('Price per carat (INR) must be greater than 0', 'danger')
+                        return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                except (ValueError, TypeError):
+                    flash('Invalid price per carat (INR) value', 'danger')
+                    return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+                
+                # Calculate total amounts
+                total_amount_usd = carat * price_per_carat
+                total_amount_inr = carat * price_per_carat_inr
+                
+                # Payment information
+                payment_status = request.form.get('payment_status')
+                payment_date = request.form.get('payment_date') if payment_status == 'Completed' else None
+                payment_reference = request.form.get('payment_reference') or None
+                payment_due_date = request.form.get('payment_due_date') or None
+                payment_notes = request.form.get('payment_notes') or None
+                
+                # Preserve existing partial payments
+                partial_payments = df.at[record_index, 'partial_payments']
+                
+                # Update record
+                df.at[record_index, 'Date'] = date
+                df.at[record_index, 'Party'] = party
+                df.at[record_index, 'Description'] = description
+                df.at[record_index, 'Stone ID'] = stone_id
+                df.at[record_index, 'Rough ID'] = rough_id
+                df.at[record_index, 'Kapan No'] = kapan_no
+                df.at[record_index, 'Platform'] = platform
+                df.at[record_index, 'Carat'] = carat
+                df.at[record_index, 'Quantity'] = quantity
+                df.at[record_index, 'Price Per Carat'] = price_per_carat
+                df.at[record_index, 'Price Per Carat INR'] = price_per_carat_inr
+                df.at[record_index, 'Total Amount USD'] = total_amount_usd
+                df.at[record_index, 'Total Amount INR'] = total_amount_inr
+                df.at[record_index, 'Payment Status'] = payment_status
+                df.at[record_index, 'Payment Done Date'] = payment_date
+                df.at[record_index, 'Reference Party'] = payment_reference
+                df.at[record_index, 'Payment Due Date'] = payment_due_date
+                df.at[record_index, 'Notes'] = payment_notes
+                
+                # If status is not Partial, clear partial payments
+                if payment_status != 'Partial':
+                    df.at[record_index, 'partial_payments'] = None
+                else:
+                    # Keep existing partial payments
+                    df.at[record_index, 'partial_payments'] = partial_payments
+                
+                # Save the updated DataFrame
+                df.to_excel(file_path, index=False)
+                
+                flash(f'{record_type.capitalize()} record updated successfully!', 'success')
+                return redirect(url_for('records'))
+            
+            except Exception as e:
+                flash(f'Error updating record: {str(e)}', 'danger')
+                return redirect(url_for('edit_record', record_type=record_type, record_index=record_index))
+        
+        # GET request - display the form with current values
+        record = df.iloc[record_index].to_dict()
+        
+        # Use the appropriate template based on record type
+        template_name = f'edit_{record_type}.html'
+        
+        return render_template(
+            template_name,
+            record=record,
+            record_type=record_type,
+            record_index=record_index
+        )
+    
+    except Exception as e:
+        flash(f'Error loading record: {str(e)}', 'danger')
+        return redirect(url_for('records'))
+
+@app.route('/backup')
+def backup():
+    """Create a backup of all data files."""
+    try:
+        # Create backup directory if it doesn't exist
+        backup_dir = os.path.join(DATA_DIR, 'backup')
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # Create a timestamp for the backup files
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        # Create a zip file for the backup
+        import zipfile
+        zip_filename = f'diamond_data_backup_{timestamp}.zip'
+        zip_path = os.path.join(backup_dir, zip_filename)
+        
+        with zipfile.ZipFile(zip_path, 'w') as zipf:
+            # Add purchases file if it exists
+            if os.path.exists(PURCHASES_FILE):
+                zipf.write(PURCHASES_FILE, os.path.basename(PURCHASES_FILE))
+            
+            # Add sales file if it exists
+            if os.path.exists(SALES_FILE):
+                zipf.write(SALES_FILE, os.path.basename(SALES_FILE))
+        
+        # Send the zip file to the user
+        return send_file(
+            zip_path,
+            as_attachment=True,
+            download_name=zip_filename,
+            mimetype='application/zip'
+        )
+    except Exception as e:
+        flash(f'Error creating backup: {str(e)}', 'danger')
+        return redirect(url_for('index'))
+
+@app.route('/restore', methods=['GET', 'POST'])
+def restore():
+    """Restore data from a backup file."""
+    if request.method == 'POST':
+        try:
+            # Check if a file was uploaded
+            if 'backup_file' not in request.files:
+                flash('No backup file selected', 'danger')
+                return redirect(url_for('restore'))
+            
+            backup_file = request.files['backup_file']
+            
+            # Check if the file has a name
+            if backup_file.filename == '':
+                flash('No backup file selected', 'danger')
+                return redirect(url_for('restore'))
+            
+            # Check if the file is a zip file
+            if not backup_file.filename.endswith('.zip'):
+                flash('Backup file must be a zip file', 'danger')
+                return redirect(url_for('restore'))
+            
+            # Create a temporary directory for extraction
+            import tempfile
+            import zipfile
+            import shutil
+            
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Save the uploaded file to the temporary directory
+                backup_path = os.path.join(temp_dir, 'backup.zip')
+                backup_file.save(backup_path)
+                
+                # Extract the zip file
+                with zipfile.ZipFile(backup_path, 'r') as zipf:
+                    zipf.extractall(temp_dir)
+                
+                # Create backup of current files before restoring
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                backup_dir = os.path.join(DATA_DIR, 'backup')
+                os.makedirs(backup_dir, exist_ok=True)
+                
+                if os.path.exists(PURCHASES_FILE):
+                    backup_purchases = os.path.join(backup_dir, f'purchases_before_restore_{timestamp}.xlsx')
+                    shutil.copy2(PURCHASES_FILE, backup_purchases)
+                
+                if os.path.exists(SALES_FILE):
+                    backup_sales = os.path.join(backup_dir, f'sales_before_restore_{timestamp}.xlsx')
+                    shutil.copy2(SALES_FILE, backup_sales)
+                
+                # Restore the files
+                extracted_purchases = os.path.join(temp_dir, os.path.basename(PURCHASES_FILE))
+                extracted_sales = os.path.join(temp_dir, os.path.basename(SALES_FILE))
+                
+                if os.path.exists(extracted_purchases):
+                    shutil.copy2(extracted_purchases, PURCHASES_FILE)
+                    enhance_excel_formatting(PURCHASES_FILE)
+                
+                if os.path.exists(extracted_sales):
+                    shutil.copy2(extracted_sales, SALES_FILE)
+                    enhance_excel_formatting(SALES_FILE)
+                
+                flash('Data restored successfully!', 'success')
+                return redirect(url_for('index'))
+                
+        except Exception as e:
+            flash(f'Error restoring backup: {str(e)}', 'danger')
+            return redirect(url_for('restore'))
+    
+    return render_template('restore.html')
+
+@app.route('/update_payment_status', methods=['POST'])
+def update_payment_status():
+    record_type = request.form.get('record_type')
+    record_index = request.form.get('record_index')
+    new_status = request.form.get('payment_status')
+    payment_done_date = request.form.get('payment_done_date')
+    total_amount_inr = request.form.get('total_amount_inr')
+    original_exchange_rate = request.form.get('original_exchange_rate')
+    security_hash = request.form.get('security_hash')
+    
+    # For partial payments
+    partial_amount = request.form.get('partial_amount')
+    partial_payment_date = request.form.get('partial_payment_date')
+    partial_payment_reference = request.form.get('partial_payment_reference')
+    payment_currency = request.form.get('payment_currency', 'INR')  # Default to INR
+    
+    try:
+        record_index = int(record_index)
+        
+        if record_type not in ['purchase', 'sale']:
+            flash('Invalid record type.', 'danger')
+            return redirect(url_for('records'))
+        
+        file_path = PURCHASES_FILE if record_type == 'purchase' else SALES_FILE
+        
+        if not os.path.exists(file_path):
+            flash(f'No {record_type} records found.', 'danger')
+            return redirect(url_for('records'))
+        
+        df = pd.read_excel(file_path)
+        
+        if record_index < 0 or record_index >= len(df):
+            flash('Invalid record index.', 'danger')
+            return redirect(url_for('records'))
+        
+        # Security check: Verify the total amount hasn't been tampered with
+        stored_total_inr = df.at[record_index, 'Total Amount INR']
+        if total_amount_inr and abs(float(total_amount_inr) - float(stored_total_inr)) > 0.01:
+            flash('Security warning: Total amount mismatch detected.', 'danger')
+            return redirect(url_for('records'))
+        
+        # Security check: Verify the security hash
+        if security_hash:
+            expected_hash = generate_security_hash(stored_total_inr)
+            if security_hash != expected_hash:
+                flash('Security warning: Data integrity check failed.', 'danger')
+                return redirect(url_for('records'))
+        
+        # Get the original exchange rate from the record
+        stored_rate = df.at[record_index, 'Rate']
+        if not original_exchange_rate or abs(float(original_exchange_rate) - float(stored_rate)) > 0.01:
+            # Use the stored rate if there's a mismatch
+            exchange_rate = stored_rate
+        else:
+            exchange_rate = original_exchange_rate
+        
+        # Update payment status
+        df.at[record_index, 'Payment Status'] = new_status
+        
+        # Handle different payment status types
+        if new_status == 'Completed':
+            # For completed payments, update the payment date
+            if payment_done_date:
+                df.at[record_index, 'Payment Done Date'] = payment_done_date
+            
+            # Clear partial payments if any (convert to completed)
+            df.at[record_index, 'partial_payments'] = None
+            
+        elif new_status == 'Partial':
+            # For partial payments, add to the payment history
+            if partial_amount and partial_payment_date:
+                try:
+                    partial_amount = float(partial_amount)
+                    exchange_rate = float(exchange_rate)
+                    
+                    # Get existing partial payments or create new list
+                    partial_payments = []
+                    if pd.notna(df.at[record_index, 'partial_payments']) and df.at[record_index, 'partial_payments']:
+                        try:
+                            partial_payments = json.loads(df.at[record_index, 'partial_payments'])
+                        except:
+                            partial_payments = []
+                    
+                    # Add new payment with currency information
+                    new_payment = {
+                        'date': partial_payment_date,
+                        'amount': partial_amount,
+                        'currency': payment_currency,
+                        'exchange_rate': exchange_rate,  # Always use the original exchange rate
+                        'reference': partial_payment_reference or ''
+                    }
+                    partial_payments.append(new_payment)
+                    
+                    # Store as JSON string
+                    df.at[record_index, 'partial_payments'] = json.dumps(partial_payments)
+                    
+                    # Calculate total received in both currencies
+                    total_received_usd = 0
+                    total_received_inr = 0
+                    
+                    for payment in partial_payments:
+                        payment_amount = float(payment['amount'])
+                        # Always use the original exchange rate for consistency
+                        payment_rate = float(exchange_rate)
+                        
+                        if payment.get('currency') == 'INR':
+                            # For INR payments
+                            total_received_inr += payment_amount
+                            total_received_usd += payment_amount / payment_rate
+                        else:
+                            # For USD payments
+                            total_received_usd += payment_amount
+                            total_received_inr += payment_amount * payment_rate
+                    
+                    # Check if fully paid (based on INR amount)
+                    total_amount_inr = df.at[record_index, 'Total Amount INR']
+                    
+                    # If received amount is within 1 rupee of total, consider it fully paid
+                    if abs(total_received_inr - total_amount_inr) <= 1.0:
+                        df.at[record_index, 'Payment Status'] = 'Completed'
+                        df.at[record_index, 'Payment Done Date'] = partial_payment_date
+                        
+                except ValueError:
+                    flash('Invalid payment amount or exchange rate.', 'danger')
+                    return redirect(url_for('records'))
+            else:
+                flash('Payment amount and date are required for partial payments.', 'danger')
+                return redirect(url_for('records'))
+        else:
+            # For pending or other statuses, clear payment date
+            df.at[record_index, 'Payment Done Date'] = None
+            df.at[record_index, 'partial_payments'] = None
+        
+        # Save the updated DataFrame
+        df.to_excel(file_path, index=False)
+        
+        flash(f'{record_type.capitalize()} payment status updated successfully.', 'success')
+        return redirect(url_for('records'))
+    
+    except Exception as e:
+        flash(f'Error updating payment status: {str(e)}', 'danger')
+        return redirect(url_for('records'))
+
+@app.route('/get_record_details')
+def get_record_details():
+    record_type = request.args.get('record_type')
+    record_index = request.args.get('record_index')
+    
+    try:
+        record_index = int(record_index)
+        
+        if record_type not in ['purchase', 'sale']:
+            return jsonify({'error': 'Invalid record type'}), 400
+        
+        file_path = PURCHASES_FILE if record_type == 'purchase' else SALES_FILE
+        
+        if not os.path.exists(file_path):
+            return jsonify({'error': f'No {record_type} records found'}), 404
+        
+        df = pd.read_excel(file_path)
+        
+        if record_index < 0 or record_index >= len(df):
+            return jsonify({'error': 'Invalid record index'}), 400
+        
+        # Get record details
+        record = df.iloc[record_index].replace({pd.NA: None, float('nan'): None})
+        
+        # Convert to dictionary
+        record_dict = record.to_dict()
+        
+        # Parse partial payments if they exist
+        if 'partial_payments' in record_dict and record_dict['partial_payments']:
+            try:
+                if isinstance(record_dict['partial_payments'], str):
+                    record_dict['partial_payments'] = json.loads(record_dict['partial_payments'])
+                else:
+                    record_dict['partial_payments'] = []
+            except:
+                record_dict['partial_payments'] = []
+        else:
+            record_dict['partial_payments'] = []
+        
+        # Ensure all required fields exist
+        if 'Total Amount USD' not in record_dict:
+            record_dict['Total Amount USD'] = record_dict.get('Total Amount', 0)
+        
+        if 'Total Amount INR' not in record_dict:
+            # Calculate INR amount if not present
+            if 'Rate' in record_dict and record_dict['Rate'] and record_dict['Rate'] is not None and 'Total Amount USD' in record_dict:
+                try:
+                    rate = float(record_dict['Rate'])
+                    total_usd = float(record_dict['Total Amount USD'])
+                    record_dict['Total Amount INR'] = total_usd * rate
+                except (ValueError, TypeError):
+                    record_dict['Total Amount INR'] = 0
+            else:
+                record_dict['Total Amount INR'] = 0
+        
+        # Ensure Rate is present
+        if 'Rate' not in record_dict or not record_dict['Rate']:
+            record_dict['Rate'] = 83.50  # Default rate
+        
+        # Calculate received amounts in both currencies using the original rate
+        total_received_usd = 0
+        total_received_inr = 0
+        original_rate = float(record_dict['Rate'])
+        
+        if record_dict['partial_payments']:
+            for payment in record_dict['partial_payments']:
+                payment_amount = float(payment['amount'])
+                
+                # Always use the original exchange rate for consistency
+                if payment.get('currency') == 'INR':
+                    # For INR payments
+                    total_received_inr += payment_amount
+                    total_received_usd += payment_amount / original_rate
+                else:
+                    # For USD payments
+                    total_received_usd += payment_amount
+                    total_received_inr += payment_amount * original_rate
+                
+                # Ensure the payment has the original exchange rate
+                payment['exchange_rate'] = original_rate
+        
+        # Add received amounts to the response
+        record_dict['received_amount_usd'] = total_received_usd
+        record_dict['received_amount_inr'] = total_received_inr
+        record_dict['remaining_amount_usd'] = max(0, float(record_dict['Total Amount USD']) - total_received_usd)
+        record_dict['remaining_amount_inr'] = max(0, float(record_dict['Total Amount INR']) - total_received_inr)
+        
+        # Convert numeric values to proper format
+        for key in record_dict:
+            if key in ['Total Amount USD', 'Total Amount INR', 'Rate', 
+                      'received_amount_usd', 'received_amount_inr', 
+                      'remaining_amount_usd', 'remaining_amount_inr']:
+                try:
+                    if record_dict[key] is not None:
+                        record_dict[key] = float(record_dict[key])
+                except (ValueError, TypeError):
+                    record_dict[key] = 0
+        
+        # Add a security hash to prevent tampering with total amounts
+        record_dict['security_hash'] = generate_security_hash(record_dict['Total Amount INR'])
+        
+        # Add a flag indicating the rate is locked
+        record_dict['rate_locked'] = True
+        
+        return jsonify(record_dict)
+    
+    except Exception as e:
+        app.logger.error(f"Error in get_record_details: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+def generate_security_hash(amount):
+    """Generate a simple hash for security verification of amount"""
+    if amount is None:
+        return ""
+    # Use a simple hash for demonstration - in production, use a proper cryptographic approach
+    amount_str = str(float(amount))
+    return hashlib.md5((amount_str + app.secret_key).encode()).hexdigest()[:10]
+
+# Function to format currency
+def format_currency(value):
+    try:
+        return "{:,.2f}".format(float(value))
+    except (ValueError, TypeError):
+        return "0.00"
+
+# Add the format_currency filter to Jinja2
+app.jinja_env.filters['format_currency'] = format_currency
+
+def get_payment_status_color(status):
+    status_colors = {
+        'pending': 'danger',
+        'partial': 'warning',
+        'completed': 'success'
+    }
+    return status_colors.get(status.lower(), 'secondary')
+
+@app.route('/payments')
+def payments():
+    try:
+        # Load payments data
+        if os.path.exists(PAYMENTS_FILE):
+            payments_df = pd.read_excel(PAYMENTS_FILE)
+        else:
+            payments_df = pd.DataFrame(columns=['id', 'type', 'name', 'total_amount', 'paid_amount', 'pending_amount', 
+                                     'status', 'payment_date', 'payment_method', 'notes'])
+            payments_df.to_excel(PAYMENTS_FILE, index=False)
+
+        # Load purchases and sales data
+        purchases_df = pd.read_excel(PURCHASES_FILE) if os.path.exists(PURCHASES_FILE) else pd.DataFrame()
+        sales_df = pd.read_excel(SALES_FILE) if os.path.exists(SALES_FILE) else pd.DataFrame()
+
+        # Calculate totals
+        total_pending = payments_df['pending_amount'].sum() if not payments_df.empty else 0
+        total_received = payments_df['paid_amount'].sum() if not payments_df.empty else 0
+        total_purchases = purchases_df['Total Amount INR'].sum() if not purchases_df.empty else 0
+        total_sales = sales_df['Total Amount INR'].sum() if not sales_df.empty else 0
+
+        # Apply filters if provided
+        status = request.args.get('status')
+        type_filter = request.args.get('type')
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        # Prepare transactions list
+        transactions = []
+
+        # Safely convert a date with full NaT handling
+        def safe_date_convert(date_value):
+            if pd.isna(date_value):
+                return pd.Timestamp.now(), "00:00"
+            
+            try:
+                date_obj = pd.to_datetime(date_value)
+                if pd.isna(date_obj):
+                    return pd.Timestamp.now(), "00:00"
+                return date_obj, date_obj.strftime('%H:%M')
+            except:
+                return pd.Timestamp.now(), "00:00"
+
+        # Add purchases to transactions
+        if not purchases_df.empty:
+            for _, row in purchases_df.iterrows():
+                # Safely handle all potential NaT/NaN values
+                date_value, time_str = safe_date_convert(row.get('Date'))
+                status_value = str(row.get('Payment Status', "Unknown")) if pd.notna(row.get('Payment Status')) else "Unknown"
+                party_value = str(row.get('Party', "Unknown")) if pd.notna(row.get('Party')) else "Unknown"
+                
+                try:
+                    amount = float(row.get('Total Amount INR', 0))
+                except:
+                    amount = 0
+                
+                transaction = {
+                    'date': date_value,
+                    'time': time_str,
+                    'type': 'purchase',
+                    'party': party_value,
+                    'amount': amount,
+                    'status': status_value,
+                    'status_color': get_payment_status_color(status_value),
+                    'id': str(row.name)  # Use index as ID
+                }
+                transactions.append(transaction)
+
+        # Add sales to transactions
+        if not sales_df.empty:
+            for _, row in sales_df.iterrows():
+                # Safely handle all potential NaT/NaN values
+                date_value, time_str = safe_date_convert(row.get('Date'))
+                status_value = str(row.get('Payment Status', "Unknown")) if pd.notna(row.get('Payment Status')) else "Unknown"
+                party_value = str(row.get('Party', "Unknown")) if pd.notna(row.get('Party')) else "Unknown"
+                
+                try:
+                    amount = float(row.get('Total Amount INR', 0))
+                except:
+                    amount = 0
+                
+                transaction = {
+                    'date': date_value,
+                    'time': time_str,
+                    'type': 'sale',
+                    'party': party_value,
+                    'amount': amount,
+                    'status': status_value,
+                    'status_color': get_payment_status_color(status_value),
+                    'id': str(row.name)  # Use index as ID
+                }
+                transactions.append(transaction)
+
+        # Add payments to transactions
+        if not payments_df.empty:
+            for _, row in payments_df.iterrows():
+                # Safely handle all potential NaT/NaN values
+                date_value, time_str = safe_date_convert(row.get('payment_date'))
+                status_value = str(row.get('status', "Unknown")) if pd.notna(row.get('status')) else "Unknown"
+                name_value = str(row.get('name', "Unknown")) if pd.notna(row.get('name')) else "Unknown"
+                
+                try:
+                    amount = float(row.get('total_amount', 0))
+                except:
+                    amount = 0
+                
+                transaction = {
+                    'date': date_value,
+                    'time': time_str,
+                    'type': 'payment',
+                    'party': name_value,
+                    'amount': amount,
+                    'status': status_value,
+                    'status_color': get_payment_status_color(status_value),
+                    'id': str(row.get('id', row.name))
+                }
+                transactions.append(transaction)
+
+        # Sort transactions by date (newest first)
+        transactions.sort(key=lambda x: x['date'], reverse=True)
+
+        # Apply filters to transactions
+        if status:
+            transactions = [t for t in transactions if isinstance(t['status'], str) and t['status'].lower() == status.lower()]
+        if type_filter:
+            transactions = [t for t in transactions if t['type'] == type_filter]
+        if start_date:
+            try:
+                start_date = pd.to_datetime(start_date)
+                transactions = [t for t in transactions if t['date'] >= start_date]
+            except:
+                pass  # Ignore invalid start date
+        if end_date:
+            try:
+                end_date = pd.to_datetime(end_date)
+                transactions = [t for t in transactions if t['date'] <= end_date]
+            except:
+                pass  # Ignore invalid end date
+
+        # Prepare pending payments list from both purchases and sales
+        pending_payments = []
+
+        # Add pending purchases
+        if not purchases_df.empty:
+            for _, row in purchases_df.iterrows():
+                # Check if payment status is pending or partial (case insensitive)
+                status_value = str(row.get('Payment Status', "")).lower() if pd.notna(row.get('Payment Status')) else ""
+                if status_value not in ['pending', 'partial']:
+                    continue
+                
+                # Safely get date
+                date_value, _ = safe_date_convert(row.get('Date'))
+                
+                # Ensure values are of proper type
+                formatted_status = str(row.get('Payment Status', "Unknown")) if pd.notna(row.get('Payment Status')) else "Unknown"
+                party_value = str(row.get('Party', "Unknown")) if pd.notna(row.get('Party')) else "Unknown"
+                
+                try:
+                    amount = float(row.get('Total Amount INR', 0))
+                except:
+                    amount = 0
+                
+                payment = {
+                    'id': str(row.name),
+                    'type': 'supplier',
+                    'name': party_value,
+                    'total_amount': amount,
+                    'pending_amount': amount,
+                    'status': formatted_status,
+                    'status_color': get_payment_status_color(formatted_status),
+                    'reference_type': 'purchase',
+                    'date': date_value
+                }
+                pending_payments.append(payment)
+
+        # Add pending sales
+        if not sales_df.empty:
+            for _, row in sales_df.iterrows():
+                # Check if payment status is pending or partial (case insensitive)
+                status_value = str(row.get('Payment Status', "")).lower() if pd.notna(row.get('Payment Status')) else ""
+                if status_value not in ['pending', 'partial']:
+                    continue
+                
+                # Safely get date
+                date_value, _ = safe_date_convert(row.get('Date'))
+                
+                # Ensure values are of proper type
+                formatted_status = str(row.get('Payment Status', "Unknown")) if pd.notna(row.get('Payment Status')) else "Unknown"
+                party_value = str(row.get('Party', "Unknown")) if pd.notna(row.get('Party')) else "Unknown"
+                
+                try:
+                    amount = float(row.get('Total Amount INR', 0))
+                except:
+                    amount = 0
+                
+                payment = {
+                    'id': str(row.name),
+                    'type': 'customer',
+                    'name': party_value,
+                    'total_amount': amount,
+                    'pending_amount': amount,
+                    'status': formatted_status,
+                    'status_color': get_payment_status_color(formatted_status),
+                    'reference_type': 'sale',
+                    'date': date_value
+                }
+                pending_payments.append(payment)
+
+        # Apply filters to pending payments
+        if type_filter:
+            type_filter_lower = type_filter.lower()
+            pending_payments = [p for p in pending_payments if p['type'] == type_filter_lower]
+        if start_date:
+            try:
+                start_date = pd.to_datetime(start_date)
+                pending_payments = [p for p in pending_payments if p['date'] >= start_date]
+            except:
+                pass  # Ignore invalid start date
+        if end_date:
+            try:
+                end_date = pd.to_datetime(end_date)
+                pending_payments = [p for p in pending_payments if p['date'] <= end_date]
+            except:
+                pass  # Ignore invalid end date
+
+        return render_template('payments.html', 
+                             payments=pending_payments,
+                             transactions=transactions,
+                             total_pending=total_pending,
+                             total_received=total_received,
+                             total_purchases=total_purchases,
+                             total_sales=total_sales)
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        flash(f'Error loading payments: {str(e)}\n{error_details}', 'error')
+        return render_template('payments.html', 
+                             payments=[],
+                             transactions=[],
+                             total_pending=0,
+                             total_received=0,
+                             total_purchases=0,
+                             total_sales=0)
 
 @app.route('/add_payment', methods=['POST'])
 def add_payment():
@@ -1598,62 +2518,15 @@ def edit_payment(payment_id):
         return redirect(url_for('payments'))
 
 def get_inventory_status_color(status):
-    """
-    Returns a Bootstrap color class based on inventory status.
-    """
-    status = str(status).lower()
-    if status == 'in stock':
-        return 'success'
-    elif status == 'sold':
-        return 'danger'
-    elif status == 'reserved':
-        return 'warning'
-    elif status == 'processing':
-        return 'info'
-    else:
-        return 'secondary'
-
-def get_color_from_form(form_data):
-    """
-    Extract the color value from form data based on color type.
-    """
-    color_type = form_data.get('color_type', 'White')
-    
-    if color_type == 'White':
-        return form_data.get('white_color', '')
-    elif color_type == 'Fancy':
-        fancy_color = form_data.get('fancy_color', '')
-        fancy_intensity = form_data.get('fancy_intensity', '')
-        
-        # Check if custom fancy color is provided
-        custom_fancy_color = form_data.get('custom_fancy_color', '')
-        if custom_fancy_color and custom_fancy_color.strip():
-            fancy_color = custom_fancy_color
-        
-        # Combine intensity and color
-        if fancy_intensity and fancy_color:
-            return f"{fancy_intensity} {fancy_color}"
-        else:
-            return fancy_color
-    
-    return ''
-
-def get_shape_from_form(form_data, form_type='polished'):
-    """
-    Extract the shape value from form data, handling custom shapes.
-    """
-    if form_type == 'polished':
-        shape = form_data.get('shape_select', '')
-        custom_shape = form_data.get('custom_shape', '')
-    else:  # rough
-        shape = form_data.get('shape_category', '')
-        custom_shape = form_data.get('rough_custom_shape', '')
-    
-    # Check if custom shape is provided
-    if shape == 'Other' and custom_shape and custom_shape.strip():
-        return custom_shape
-    
-    return shape
+    """Return Bootstrap color class based on inventory status."""
+    status_colors = {
+        'in stock': 'success',
+        'reserved': 'warning',
+        'sold': 'secondary',
+        'damaged': 'danger',
+        'lost': 'danger'
+    }
+    return status_colors.get(status.lower(), 'secondary')
 
 @app.route('/inventory')
 def inventory():
@@ -1663,8 +2536,7 @@ def inventory():
             inventory_df = pd.read_excel(INVENTORY_FILE)
         else:
             inventory_df = pd.DataFrame(columns=['id', 'description', 'shape', 'carats', 'color', 'clarity', 'cut', 
-                                              'purchase_price', 'market_value', 'status', 'location', 'purchase_date', 
-                                              'notes', 'rough_id'])
+                                              'purchase_price', 'market_value', 'status', 'location', 'purchase_date', 'notes'])
             inventory_df.to_excel(INVENTORY_FILE, index=False)
         
         # Apply filters if provided
@@ -1674,7 +2546,6 @@ def inventory():
         max_carats = request.args.get('max_carats')
         min_price = request.args.get('min_price')
         max_price = request.args.get('max_price')
-        rough_id = request.args.get('rough_id')
         
         filtered_df = inventory_df.copy()
         
@@ -1690,8 +2561,6 @@ def inventory():
             filtered_df = filtered_df[filtered_df['market_value'] >= float(min_price)]
         if max_price:
             filtered_df = filtered_df[filtered_df['market_value'] <= float(max_price)]
-        if rough_id:
-            filtered_df = filtered_df[filtered_df['rough_id'] == rough_id]
         
         # Calculate totals
         total_items = len(filtered_df)
@@ -1701,31 +2570,9 @@ def inventory():
         # Count low stock items (items with only 1 in stock)
         low_stock_count = len(filtered_df[filtered_df['status'].str.lower() == 'in stock']) if not filtered_df.empty else 0
         
-        # Load rough inventory for dropdown
-        rough_inventory_options = []
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            for _, row in rough_inventory_df.iterrows():
-                if row.get('status') != 'Processed' and row.get('status') != 'Sold':
-                    rough_inventory_options.append({
-                        'id': row.get('id', ''),
-                        'description': row.get('description', ''),
-                        'weight': row.get('weight', 0),
-                        'pieces': row.get('pieces', 1)
-                    })
-        
         # Prepare inventory items for display
         inventory = []
         for _, row in filtered_df.iterrows():
-            # Get rough stone info if available
-            rough_info = ""
-            if 'rough_id' in row and row['rough_id']:
-                if os.path.exists(ROUGH_INVENTORY_FILE):
-                    rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                    rough_data = rough_inventory_df[rough_inventory_df['id'] == row['rough_id']]
-                    if not rough_data.empty:
-                        rough_info = f"{rough_data.iloc[0].get('description', '')} ({rough_data.iloc[0].get('weight', 0)} ct)"
-            
             item = {
                 'id': row.get('id', ''),
                 'description': row.get('description', ''),
@@ -1739,9 +2586,7 @@ def inventory():
                 'status': row.get('status', ''),
                 'status_color': get_inventory_status_color(str(row.get('status', ''))),
                 'location': row.get('location', ''),
-                'notes': row.get('notes', ''),
-                'rough_id': row.get('rough_id', ''),
-                'rough_info': rough_info
+                'notes': row.get('notes', '')
             }
             inventory.append(item)
         
@@ -1763,8 +2608,7 @@ def inventory():
                              shape_labels=shape_labels,
                              shape_data=shape_data,
                              clarity_labels=clarity_labels,
-                             clarity_data=clarity_data,
-                             rough_inventory_options=rough_inventory_options)
+                             clarity_data=clarity_data)
     except Exception as e:
         flash(f'Error loading inventory: {str(e)}', 'error')
         return render_template('inventory.html', 
@@ -1776,8 +2620,7 @@ def inventory():
                              shape_labels=[],
                              shape_data=[],
                              clarity_labels=[],
-                             clarity_data=[],
-                             rough_inventory_options=[])
+                             clarity_data=[])
 
 @app.route('/add_inventory_item', methods=['POST'])
 def add_inventory_item():
@@ -1794,15 +2637,13 @@ def add_inventory_item():
         status = request.form.get('status')
         location = request.form.get('location')
         notes = request.form.get('notes')
-        rough_id = request.form.get('rough_id')
         
         # Load existing inventory
         if os.path.exists(INVENTORY_FILE):
             inventory_df = pd.read_excel(INVENTORY_FILE)
         else:
             inventory_df = pd.DataFrame(columns=['id', 'description', 'shape', 'carats', 'color', 'clarity', 'cut', 
-                                              'purchase_price', 'market_value', 'status', 'location', 'purchase_date', 
-                                              'notes', 'rough_id'])
+                                              'purchase_price', 'market_value', 'status', 'location', 'purchase_date', 'notes'])
         
         # Generate a unique ID
         item_id = f"D{int(time.time())}"
@@ -1821,8 +2662,7 @@ def add_inventory_item():
             'status': status,
             'location': location,
             'purchase_date': pd.Timestamp.now().strftime('%Y-%m-%d'),
-            'notes': notes,
-            'rough_id': rough_id
+            'notes': notes
         }
         
         # Add to DataFrame
@@ -1830,26 +2670,6 @@ def add_inventory_item():
         
         # Save to Excel
         inventory_df.to_excel(INVENTORY_FILE, index=False)
-        
-        # Update rough stone status if a rough stone was selected
-        if rough_id:
-            if os.path.exists(ROUGH_INVENTORY_FILE):
-                rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                rough_item_index = rough_inventory_df[rough_inventory_df['id'] == rough_id].index
-                
-                if len(rough_item_index) > 0:
-                    # Check if all carats from rough stone have been processed
-                    rough_weight = rough_inventory_df.loc[rough_item_index[0], 'weight']
-                    
-                    # Get all polished diamonds from this rough stone
-                    polished_diamonds = inventory_df[inventory_df['rough_id'] == rough_id]
-                    total_polished_carats = polished_diamonds['carats'].sum()
-                    
-                    # If more than 90% of the rough weight has been processed, mark as processed
-                    if total_polished_carats >= (rough_weight * 0.9):
-                        rough_inventory_df.loc[rough_item_index[0], 'status'] = 'Processed'
-                        rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                        flash('Rough stone marked as processed as most of its weight has been converted to polished diamonds.', 'info')
         
         flash('Inventory item added successfully!', 'success')
         return redirect(url_for('inventory'))
@@ -1862,197 +2682,68 @@ def inventory_item_details(item_id):
     try:
         # Load inventory data
         if not os.path.exists(INVENTORY_FILE):
-            flash('Inventory file not found', 'error')
+            flash('Inventory file not found.', 'error')
             return redirect(url_for('inventory'))
         
         inventory_df = pd.read_excel(INVENTORY_FILE)
         
         # Find the item
-        item_data = inventory_df[inventory_df['id'] == item_id]
-        
-        if item_data.empty:
-            flash('Item not found', 'error')
+        item_row = inventory_df[inventory_df['id'] == item_id]
+        if item_row.empty:
+            flash('Item not found.', 'error')
             return redirect(url_for('inventory'))
         
-        # Get rough stone info if available
-        rough_stone = None
-        if 'rough_id' in item_data.columns and item_data.iloc[0]['rough_id']:
-            rough_id = item_data.iloc[0]['rough_id']
-            if os.path.exists(ROUGH_INVENTORY_FILE):
-                rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                rough_data = rough_inventory_df[rough_inventory_df['id'] == rough_id]
-                if not rough_data.empty:
-                    rough_stone = {
-                        'id': rough_data.iloc[0].get('id', ''),
-                        'description': rough_data.iloc[0].get('description', ''),
-                        'source': rough_data.iloc[0].get('source', ''),
-                        'origin': rough_data.iloc[0].get('origin', ''),
-                        'weight': rough_data.iloc[0].get('weight', 0),
-                        'pieces': rough_data.iloc[0].get('pieces', 1),
-                        'status': rough_data.iloc[0].get('status', ''),
-                        'status_color': get_inventory_status_color(str(rough_data.iloc[0].get('status', ''))),
-                        'image_path': rough_data.iloc[0].get('image_path', '')
-                    }
+        # Get item details
+        item = item_row.iloc[0].to_dict()
+        item['status_color'] = get_inventory_status_color(str(item.get('status', '')))
         
-        # Prepare item for display
-        item = {
-            'id': item_data.iloc[0].get('id', ''),
-            'description': item_data.iloc[0].get('description', ''),
-            'shape': item_data.iloc[0].get('shape', ''),
-            'carats': item_data.iloc[0].get('carats', 0),
-            'color': item_data.iloc[0].get('color', ''),
-            'clarity': item_data.iloc[0].get('clarity', ''),
-            'cut': item_data.iloc[0].get('cut', ''),
-            'purchase_price': item_data.iloc[0].get('purchase_price', 0),
-            'market_value': item_data.iloc[0].get('market_value', 0),
-            'status': item_data.iloc[0].get('status', ''),
-            'status_color': get_inventory_status_color(str(item_data.iloc[0].get('status', ''))),
-            'location': item_data.iloc[0].get('location', ''),
-            'purchase_date': item_data.iloc[0].get('purchase_date', ''),
-            'notes': item_data.iloc[0].get('notes', ''),
-            'rough_id': item_data.iloc[0].get('rough_id', ''),
-            'kapan_no': item_data.iloc[0].get('kapan_no', '')
-        }
-        
-        return render_template('inventory_item_details.html', item=item, rough_stone=rough_stone)
+        return render_template('inventory_item_details.html', item=item)
     except Exception as e:
         flash(f'Error loading item details: {str(e)}', 'error')
         return redirect(url_for('inventory'))
 
 @app.route('/edit_inventory_item/<item_id>', methods=['GET', 'POST'])
 def edit_inventory_item(item_id):
-    if request.method == 'GET':
-        try:
-            # Load inventory data
-            if not os.path.exists(INVENTORY_FILE):
-                flash('Inventory file not found', 'error')
-                return redirect(url_for('inventory'))
-            
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            
-            # Find the item
-            item_data = inventory_df[inventory_df['id'] == item_id]
-            
-            if item_data.empty:
-                flash('Item not found', 'error')
-                return redirect(url_for('inventory'))
-            
-            # Prepare item for display
-            item = {
-                'id': item_data.iloc[0].get('id', ''),
-                'description': item_data.iloc[0].get('description', ''),
-                'shape': item_data.iloc[0].get('shape', ''),
-                'carats': item_data.iloc[0].get('carats', 0),
-                'color': item_data.iloc[0].get('color', ''),
-                'clarity': item_data.iloc[0].get('clarity', ''),
-                'cut': item_data.iloc[0].get('cut', ''),
-                'purchase_price': item_data.iloc[0].get('purchase_price', 0),
-                'market_value': item_data.iloc[0].get('market_value', 0),
-                'status': item_data.iloc[0].get('status', ''),
-                'location': item_data.iloc[0].get('location', ''),
-                'notes': item_data.iloc[0].get('notes', ''),
-                'rough_id': item_data.iloc[0].get('rough_id', ''),
-                'kapan_no': item_data.iloc[0].get('kapan_no', '')
-            }
-            
-            # Load rough inventory for dropdown
-            rough_inventory_options = []
-            if os.path.exists(ROUGH_INVENTORY_FILE):
-                rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                for _, row in rough_inventory_df.iterrows():
-                    if row.get('status') != 'Processed' and row.get('status') != 'Sold' or row.get('id') == item['rough_id']:
-                        rough_inventory_options.append({
-                            'id': row.get('id', ''),
-                            'description': row.get('description', ''),
-                            'weight': row.get('weight', 0),
-                            'pieces': row.get('pieces', 1)
-                        })
-            
-            return render_template('edit_inventory_item.html', item=item, rough_inventory_options=rough_inventory_options)
-        except Exception as e:
-            flash(f'Error loading item for editing: {str(e)}', 'error')
+    try:
+        # Load inventory data
+        if not os.path.exists(INVENTORY_FILE):
+            flash('Inventory file not found.', 'error')
             return redirect(url_for('inventory'))
-    else:  # POST request
-        try:
-            # Get form data
-            description = request.form.get('description')
-            shape = request.form.get('shape')
-            carats = float(request.form.get('carats'))
-            color = request.form.get('color')
-            clarity = request.form.get('clarity')
-            cut = request.form.get('cut')
-            purchase_price = float(request.form.get('purchase_price'))
-            market_value = float(request.form.get('market_value'))
-            status = request.form.get('status')
-            location = request.form.get('location')
-            notes = request.form.get('notes')
-            rough_id = request.form.get('rough_id')
-            kapan_no = request.form.get('kapan_no')
-            
-            # Load inventory data
-            if not os.path.exists(INVENTORY_FILE):
-                flash('Inventory file not found', 'error')
-                return redirect(url_for('inventory'))
-            
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            
-            # Find the item
-            item_index = inventory_df[inventory_df['id'] == item_id].index
-            
-            if len(item_index) == 0:
-                flash('Item not found', 'error')
-                return redirect(url_for('inventory'))
-            
-            # Get the previous rough_id to check if it changed
-            previous_rough_id = inventory_df.loc[item_index[0], 'rough_id'] if 'rough_id' in inventory_df.columns else None
-            
-            # Update the item
-            inventory_df.loc[item_index[0], 'description'] = description
-            inventory_df.loc[item_index[0], 'shape'] = shape
-            inventory_df.loc[item_index[0], 'carats'] = carats
-            inventory_df.loc[item_index[0], 'color'] = color
-            inventory_df.loc[item_index[0], 'clarity'] = clarity
-            inventory_df.loc[item_index[0], 'cut'] = cut
-            inventory_df.loc[item_index[0], 'purchase_price'] = purchase_price
-            inventory_df.loc[item_index[0], 'market_value'] = market_value
-            inventory_df.loc[item_index[0], 'status'] = status
-            inventory_df.loc[item_index[0], 'location'] = location
-            inventory_df.loc[item_index[0], 'notes'] = notes
-            
-            # Ensure rough_id column exists
-            if 'rough_id' not in inventory_df.columns:
-                inventory_df['rough_id'] = ''
-            
-            inventory_df.loc[item_index[0], 'rough_id'] = rough_id
+        
+        inventory_df = pd.read_excel(INVENTORY_FILE)
+        
+        # Find the item
+        item_index = inventory_df[inventory_df['id'] == item_id].index
+        if len(item_index) == 0:
+            flash('Item not found.', 'error')
+            return redirect(url_for('inventory'))
+        
+        if request.method == 'POST':
+            # Update item with form data
+            inventory_df.at[item_index[0], 'description'] = request.form.get('description')
+            inventory_df.at[item_index[0], 'shape'] = request.form.get('shape')
+            inventory_df.at[item_index[0], 'carats'] = float(request.form.get('carats'))
+            inventory_df.at[item_index[0], 'color'] = request.form.get('color')
+            inventory_df.at[item_index[0], 'clarity'] = request.form.get('clarity')
+            inventory_df.at[item_index[0], 'cut'] = request.form.get('cut')
+            inventory_df.at[item_index[0], 'purchase_price'] = float(request.form.get('purchase_price'))
+            inventory_df.at[item_index[0], 'market_value'] = float(request.form.get('market_value'))
+            inventory_df.at[item_index[0], 'status'] = request.form.get('status')
+            inventory_df.at[item_index[0], 'location'] = request.form.get('location')
+            inventory_df.at[item_index[0], 'notes'] = request.form.get('notes')
             
             # Save to Excel
             inventory_df.to_excel(INVENTORY_FILE, index=False)
             
-            # Update rough stone status if a rough stone was selected or changed
-            if rough_id and rough_id != previous_rough_id:
-                if os.path.exists(ROUGH_INVENTORY_FILE):
-                    rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                    rough_item_index = rough_inventory_df[rough_inventory_df['id'] == rough_id].index
-                    
-                    if len(rough_item_index) > 0:
-                        # Check if all carats from rough stone have been processed
-                        rough_weight = rough_inventory_df.loc[rough_item_index[0], 'weight']
-                        
-                        # Get all polished diamonds from this rough stone
-                        polished_diamonds = inventory_df[inventory_df['rough_id'] == rough_id]
-                        total_polished_carats = polished_diamonds['carats'].sum()
-                        
-                        # If more than 90% of the rough weight has been processed, mark as processed
-                        if total_polished_carats >= (rough_weight * 0.9):
-                            rough_inventory_df.loc[rough_item_index[0], 'status'] = 'Processed'
-                            rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                            flash('Rough stone marked as processed as most of its weight has been converted to polished diamonds.', 'info')
-            
             flash('Inventory item updated successfully!', 'success')
-            return redirect(url_for('inventory_item_details', item_id=item_id))
-        except Exception as e:
-            flash(f'Error updating inventory item: {str(e)}', 'error')
-            return redirect(url_for('inventory_item_details', item_id=item_id))
+            return redirect(url_for('inventory'))
+        else:
+            # Get item details for the form
+            item = inventory_df.iloc[item_index[0]].to_dict()
+            return render_template('edit_inventory_item.html', item=item)
+    except Exception as e:
+        flash(f'Error editing inventory item: {str(e)}', 'error')
+        return redirect(url_for('inventory'))
 
 @app.route('/delete_inventory_item', methods=['POST'])
 def delete_inventory_item():
@@ -2200,1206 +2891,5 @@ def download_inventory_template():
         flash(f'Error generating template: {str(e)}', 'error')
         return redirect(url_for('inventory'))
 
-@app.route('/rough_inventory')
-def rough_inventory():
-    try:
-        # Load rough inventory data
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-        else:
-            rough_inventory_df = pd.DataFrame(columns=['id', 'lot_id', 'description', 'source', 'origin', 
-                                                    'weight', 'pieces', 'purchase_price', 'purchase_date', 
-                                                    'status', 'location', 'notes', 'image_path', 'rough_id', 'kapan_no',
-                                                    'shape_category'])
-            rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-        
-        # Apply filters if provided
-        status = request.args.get('status')
-        source = request.args.get('source')
-        min_weight = request.args.get('min_weight')
-        max_weight = request.args.get('max_weight')
-        min_price = request.args.get('min_price')
-        max_price = request.args.get('max_price')
-        is_bulk = request.args.get('is_bulk')
-        
-        filtered_df = rough_inventory_df.copy()
-        
-        if status:
-            filtered_df = filtered_df[filtered_df['status'] == status]
-        if source:
-            filtered_df = filtered_df[filtered_df['source'] == source]
-        if min_weight:
-            filtered_df = filtered_df[filtered_df['weight'] >= float(min_weight)]
-        if max_weight:
-            filtered_df = filtered_df[filtered_df['weight'] <= float(max_weight)]
-        if min_price:
-            filtered_df = filtered_df[filtered_df['purchase_price'] >= float(min_price)]
-        if max_price:
-            filtered_df = filtered_df[filtered_df['purchase_price'] <= float(max_price)]
-        if is_bulk:
-            if is_bulk == 'yes':
-                filtered_df = filtered_df[filtered_df['pieces'] > 1]
-            elif is_bulk == 'no':
-                filtered_df = filtered_df[filtered_df['pieces'] == 1]
-        
-        # Calculate totals
-        total_items = len(filtered_df)
-        total_value = filtered_df['purchase_price'].sum() if not filtered_df.empty else 0
-        total_weight = filtered_df['weight'].sum() if not filtered_df.empty else 0
-        total_pieces = filtered_df['pieces'].sum() if not filtered_df.empty else 0
-        
-        # Prepare rough inventory items for display
-        rough_inventory = []
-        for _, row in filtered_df.iterrows():
-            item = {
-                'id': row.get('id', ''),
-                'lot_id': row.get('lot_id', ''),
-                'description': row.get('description', ''),
-                'source': row.get('source', ''),
-                'origin': row.get('origin', ''),
-                'weight': row.get('weight', 0),
-                'pieces': row.get('pieces', 1),
-                'purchase_price': row.get('purchase_price', 0),
-                'purchase_date': row.get('purchase_date', ''),
-                'status': row.get('status', ''),
-                'status_color': get_inventory_status_color(str(row.get('status', ''))),
-                'location': row.get('location', ''),
-                'notes': row.get('notes', ''),
-                'image_path': row.get('image_path', '')
-            }
-            rough_inventory.append(item)
-        
-        # Prepare chart data
-        source_counts = filtered_df['source'].value_counts() if not filtered_df.empty else pd.Series()
-        source_labels = source_counts.index.tolist()
-        source_data = source_counts.values.tolist()
-        
-        status_counts = filtered_df['status'].value_counts() if not filtered_df.empty else pd.Series()
-        status_labels = status_counts.index.tolist()
-        status_data = status_counts.values.tolist()
-        
-        return render_template('rough_inventory.html', 
-                             rough_inventory=rough_inventory,
-                             total_items=total_items,
-                             total_value=total_value,
-                             total_weight=total_weight,
-                             total_pieces=total_pieces,
-                             source_labels=source_labels,
-                             source_data=source_data,
-                             status_labels=status_labels,
-                             status_data=status_data)
-    except Exception as e:
-        flash(f'Error loading rough inventory: {str(e)}', 'error')
-        return render_template('rough_inventory.html', 
-                             rough_inventory=[],
-                             total_items=0,
-                             total_value=0,
-                             total_weight=0,
-                             total_pieces=0,
-                             source_labels=[],
-                             source_data=[],
-                             status_labels=[],
-                             status_data=[])
-
-@app.route('/add_rough_inventory_item', methods=['POST'])
-def add_rough_inventory_item():
-    try:
-        # Get form data
-        description = request.form.get('description')
-        source = request.form.get('source')
-        origin = request.form.get('origin')
-        weight = float(request.form.get('weight'))
-        pieces = int(request.form.get('pieces', 1))
-        purchase_price = float(request.form.get('purchase_price'))
-        status = request.form.get('status')
-        location = request.form.get('location')
-        notes = request.form.get('notes')
-        rough_id = request.form.get('rough_id')
-        kapan_no = request.form.get('kapan_no')
-        
-        # Handle image upload if provided
-        image_path = ''
-        if 'item_image' in request.files:
-            image = request.files['item_image']
-            if image.filename != '':
-                # Create images directory if it doesn't exist
-                images_dir = os.path.join('static', 'images', 'rough')
-                os.makedirs(images_dir, exist_ok=True)
-                
-                # Generate a unique filename
-                filename = f"rough_{int(time.time())}_{secure_filename(image.filename)}"
-                image_path = os.path.join(images_dir, filename)
-                
-                # Save the image
-                image.save(image_path)
-                
-                # Store the relative path
-                image_path = image_path.replace('\\', '/')
-        
-        # Load existing rough inventory
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-        else:
-            rough_inventory_df = pd.DataFrame(columns=['id', 'lot_id', 'description', 'source', 'origin', 
-                                                    'weight', 'pieces', 'purchase_price', 'purchase_date', 
-                                                    'status', 'location', 'notes', 'image_path', 'rough_id', 'kapan_no',
-                                                    'shape_category'])
-        
-        # Generate a unique ID and lot ID
-        item_id = f"R{int(time.time())}"
-        lot_id = f"LOT-{int(time.time())[-4:]}" if pieces > 1 else ""
-        
-        # Create new item
-        new_item = {
-            'id': item_id,
-            'lot_id': lot_id,
-            'description': description,
-            'source': source,
-            'origin': origin,
-            'weight': weight,
-            'pieces': pieces,
-            'purchase_price': purchase_price,
-            'purchase_date': pd.Timestamp.now().strftime('%Y-%m-%d'),
-            'status': status,
-            'location': location,
-            'notes': notes,
-            'image_path': image_path,
-            'rough_id': rough_id,
-            'kapan_no': kapan_no,
-            'shape_category': get_shape_from_form(request.form, 'rough')
-        }
-        
-        # Add to DataFrame
-        rough_inventory_df = pd.concat([rough_inventory_df, pd.DataFrame([new_item])], ignore_index=True)
-        
-        # Save to Excel
-        rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-        
-        flash('Rough inventory item added successfully!', 'success')
-        return redirect(url_for('rough_inventory'))
-    except Exception as e:
-        flash(f'Error adding rough inventory item: {str(e)}', 'error')
-        return redirect(url_for('rough_inventory'))
-
-@app.route('/rough_inventory_item_details/<item_id>')
-def rough_inventory_item_details(item_id):
-    try:
-        # Load rough inventory data
-        if not os.path.exists(ROUGH_INVENTORY_FILE):
-            flash('Rough inventory file not found', 'error')
-            return redirect(url_for('rough_inventory'))
-        
-        rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-        
-        # Find the item
-        item_data = rough_inventory_df[rough_inventory_df['id'] == item_id]
-        
-        if item_data.empty:
-            flash('Item not found', 'error')
-            return redirect(url_for('rough_inventory'))
-        
-        # Prepare item for display
-        item = {
-            'id': item_data.iloc[0].get('id', ''),
-            'lot_id': item_data.iloc[0].get('lot_id', ''),
-            'description': item_data.iloc[0].get('description', ''),
-            'source': item_data.iloc[0].get('source', ''),
-            'origin': item_data.iloc[0].get('origin', ''),
-            'weight': item_data.iloc[0].get('weight', 0),
-            'pieces': item_data.iloc[0].get('pieces', 1),
-            'purchase_price': item_data.iloc[0].get('purchase_price', 0),
-            'purchase_date': item_data.iloc[0].get('purchase_date', ''),
-            'status': item_data.iloc[0].get('status', ''),
-            'status_color': get_inventory_status_color(str(item_data.iloc[0].get('status', ''))),
-            'location': item_data.iloc[0].get('location', ''),
-            'notes': item_data.iloc[0].get('notes', ''),
-            'image_path': item_data.iloc[0].get('image_path', '')
-        }
-        
-        # Get related polished diamonds if any
-        related_diamonds = []
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            if 'rough_id' in inventory_df.columns:
-                related_items = inventory_df[inventory_df['rough_id'] == item_id]
-                
-                for _, row in related_items.iterrows():
-                    diamond = {
-                        'id': row.get('id', ''),
-                        'description': row.get('description', ''),
-                        'shape': row.get('shape', ''),
-                        'carats': row.get('carats', 0),
-                        'status': row.get('status', ''),
-                        'status_color': get_inventory_status_color(str(row.get('status', '')))
-                    }
-                    related_diamonds.append(diamond)
-        
-        return render_template('rough_inventory_item_details.html', item=item, related_diamonds=related_diamonds)
-    except Exception as e:
-        flash(f'Error loading item details: {str(e)}', 'error')
-        return redirect(url_for('rough_inventory'))
-
-@app.route('/edit_rough_inventory_item/<item_id>', methods=['GET', 'POST'])
-def edit_rough_inventory_item(item_id):
-    if request.method == 'GET':
-        try:
-            # Load rough inventory data
-            if not os.path.exists(ROUGH_INVENTORY_FILE):
-                flash('Rough inventory file not found', 'error')
-                return redirect(url_for('rough_inventory'))
-            
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            
-            # Find the item
-            item_data = rough_inventory_df[rough_inventory_df['id'] == item_id]
-            
-            if item_data.empty:
-                flash('Item not found', 'error')
-                return redirect(url_for('rough_inventory'))
-            
-            # Prepare item for display
-            item = {
-                'id': item_data.iloc[0].get('id', ''),
-                'lot_id': item_data.iloc[0].get('lot_id', ''),
-                'description': item_data.iloc[0].get('description', ''),
-                'source': item_data.iloc[0].get('source', ''),
-                'origin': item_data.iloc[0].get('origin', ''),
-                'weight': item_data.iloc[0].get('weight', 0),
-                'pieces': item_data.iloc[0].get('pieces', 1),
-                'purchase_price': item_data.iloc[0].get('purchase_price', 0),
-                'purchase_date': item_data.iloc[0].get('purchase_date', ''),
-                'status': item_data.iloc[0].get('status', ''),
-                'location': item_data.iloc[0].get('location', ''),
-                'notes': item_data.iloc[0].get('notes', ''),
-                'image_path': item_data.iloc[0].get('image_path', '')
-            }
-            
-            return render_template('edit_rough_inventory_item.html', item=item)
-        except Exception as e:
-            flash(f'Error loading item for editing: {str(e)}', 'error')
-            return redirect(url_for('rough_inventory'))
-    else:  # POST request
-        try:
-            # Get form data
-            description = request.form.get('description')
-            source = request.form.get('source')
-            origin = request.form.get('origin')
-            weight = float(request.form.get('weight'))
-            pieces = int(request.form.get('pieces', 1))
-            purchase_price = float(request.form.get('purchase_price'))
-            status = request.form.get('status')
-            location = request.form.get('location')
-            notes = request.form.get('notes')
-            rough_id = request.form.get('rough_id')
-            kapan_no = request.form.get('kapan_no')
-            
-            # Load rough inventory data
-            if not os.path.exists(ROUGH_INVENTORY_FILE):
-                flash('Rough inventory file not found', 'error')
-                return redirect(url_for('rough_inventory'))
-            
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            
-            # Find the item
-            item_index = rough_inventory_df[rough_inventory_df['id'] == item_id].index
-            
-            if len(item_index) == 0:
-                flash('Item not found', 'error')
-                return redirect(url_for('rough_inventory'))
-            
-            # Handle image upload if provided
-            image_path = rough_inventory_df.loc[item_index[0], 'image_path']
-            if 'item_image' in request.files:
-                image = request.files['item_image']
-                if image.filename != '':
-                    # Create images directory if it doesn't exist
-                    images_dir = os.path.join('static', 'images', 'rough')
-                    os.makedirs(images_dir, exist_ok=True)
-                    
-                    # Generate a unique filename
-                    filename = f"rough_{int(time.time())}_{secure_filename(image.filename)}"
-                    new_image_path = os.path.join(images_dir, filename)
-                    
-                    # Save the image
-                    image.save(new_image_path)
-                    
-                    # Store the relative path
-                    image_path = new_image_path.replace('\\', '/')
-            
-            # Update the item
-            rough_inventory_df.loc[item_index[0], 'description'] = description
-            rough_inventory_df.loc[item_index[0], 'source'] = source
-            rough_inventory_df.loc[item_index[0], 'origin'] = origin
-            rough_inventory_df.loc[item_index[0], 'weight'] = weight
-            rough_inventory_df.loc[item_index[0], 'pieces'] = pieces
-            rough_inventory_df.loc[item_index[0], 'purchase_price'] = purchase_price
-            rough_inventory_df.loc[item_index[0], 'status'] = status
-            rough_inventory_df.loc[item_index[0], 'location'] = location
-            rough_inventory_df.loc[item_index[0], 'notes'] = notes
-            rough_inventory_df.loc[item_index[0], 'image_path'] = image_path
-            
-            # Update lot_id based on pieces
-            if pieces > 1 and not rough_inventory_df.loc[item_index[0], 'lot_id']:
-                rough_inventory_df.loc[item_index[0], 'lot_id'] = f"LOT-{str(int(time.time()))[-4:]}"
-            elif pieces == 1:
-                rough_inventory_df.loc[item_index[0], 'lot_id'] = ""
-            
-            rough_inventory_df.loc[item_index[0], 'rough_id'] = rough_id
-            rough_inventory_df.loc[item_index[0], 'kapan_no'] = kapan_no
-            rough_inventory_df.loc[item_index[0], 'shape_category'] = get_shape_from_form(request.form, 'rough')
-            
-            # Save to Excel
-            rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-            
-            flash('Rough inventory item updated successfully!', 'success')
-            return redirect(url_for('rough_inventory_item_details', item_id=item_id))
-        except Exception as e:
-            flash(f'Error updating rough inventory item: {str(e)}', 'error')
-            return redirect(url_for('rough_inventory_item_details', item_id=item_id))
-
-@app.route('/delete_rough_inventory_item', methods=['POST'])
-def delete_rough_inventory_item():
-    try:
-        data = request.get_json()
-        item_id = data.get('item_id')
-        
-        # Load rough inventory data
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            
-            # Find the item
-            item_data = rough_inventory_df[rough_inventory_df['id'] == item_id]
-            
-            if not item_data.empty:
-                # Check if there are related polished diamonds
-                has_related_diamonds = False
-                if os.path.exists(INVENTORY_FILE):
-                    inventory_df = pd.read_excel(INVENTORY_FILE)
-                    if 'rough_id' in inventory_df.columns:
-                        related_items = inventory_df[inventory_df['rough_id'] == item_id]
-                        has_related_diamonds = not related_items.empty
-                
-                if has_related_diamonds:
-                    return jsonify({'success': False, 'message': 'Cannot delete rough stone with related polished diamonds'})
-                
-                # Delete the image if it exists
-                image_path = item_data.iloc[0].get('image_path', '')
-                if image_path and os.path.exists(image_path):
-                    os.remove(image_path)
-                
-                # Remove the item
-                rough_inventory_df = rough_inventory_df[rough_inventory_df['id'] != item_id]
-                
-                # Save updated inventory
-                rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                
-                return jsonify({'success': True, 'message': 'Item deleted successfully'})
-            else:
-                return jsonify({'success': False, 'message': 'Item not found'})
-        else:
-            return jsonify({'success': False, 'message': 'Rough inventory file not found'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)})
-
-@app.route('/download_rough_inventory_template')
-def download_rough_inventory_template():
-    try:
-        # Create a template DataFrame with the required columns
-        template_df = pd.DataFrame(columns=['description', 'source', 'origin', 'weight', 'pieces', 
-                                          'purchase_price', 'status', 'location', 'notes'])
-        
-        # Add a sample row to help users understand the format
-        sample_row = {
-            'description': 'Sample Rough Diamond',
-            'source': 'Mine Direct',
-            'origin': 'South Africa',
-            'weight': 5.75,
-            'pieces': 3,
-            'purchase_price': 250000,
-            'status': 'In Stock',
-            'location': 'Vault 2',
-            'notes': 'Good quality rough with minimal inclusions'
-        }
-        template_df = pd.concat([template_df, pd.DataFrame([sample_row])], ignore_index=True)
-        
-        # Create a BytesIO object to store the Excel file
-        output = io.BytesIO()
-        
-        # Write the DataFrame to the BytesIO object
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            template_df.to_excel(writer, index=False)
-        
-        # Seek to the beginning of the BytesIO object
-        output.seek(0)
-        
-        # Return the Excel file as a response
-        return send_file(
-            output,
-            as_attachment=True,
-            download_name='rough_inventory_template.xlsx',
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-    except Exception as e:
-        flash(f'Error generating template: {str(e)}', 'error')
-        return redirect(url_for('rough_inventory'))
-
-@app.route('/upload_rough_inventory', methods=['POST'])
-def upload_rough_inventory():
-    try:
-        if 'inventory_file' not in request.files:
-            flash('No file part', 'error')
-            return redirect(url_for('rough_inventory'))
-        
-        file = request.files['inventory_file']
-        
-        if file.filename == '':
-            flash('No selected file', 'error')
-            return redirect(url_for('rough_inventory'))
-        
-        if file and file.filename.endswith(('.xlsx', '.xls')):
-            # Read the uploaded Excel file
-            uploaded_df = pd.read_excel(file)
-            
-            # Check if the file has the required columns
-            required_columns = ['description', 'source', 'weight', 'pieces', 'purchase_price', 'status']
-            
-            missing_columns = [col for col in required_columns if col not in uploaded_df.columns]
-            
-            if missing_columns:
-                flash(f'Missing required columns: {", ".join(missing_columns)}', 'error')
-                return redirect(url_for('rough_inventory'))
-            
-            # Load existing rough inventory
-            if os.path.exists(ROUGH_INVENTORY_FILE):
-                rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            else:
-                rough_inventory_df = pd.DataFrame(columns=['id', 'lot_id', 'description', 'source', 'origin', 
-                                                        'weight', 'pieces', 'purchase_price', 'purchase_date', 
-                                                        'status', 'location', 'notes', 'image_path', 'rough_id', 'kapan_no',
-                                                        'shape_category'])
-            
-            # Process each row in the uploaded file
-            successful_imports = 0
-            for _, row in uploaded_df.iterrows():
-                try:
-                    # Generate a unique ID
-                    item_id = f"R{int(time.time())}{successful_imports}"
-                    
-                    # Determine if it's a bulk lot
-                    pieces = int(row.get('pieces', 1))
-                    lot_id = f"LOT-{str(int(time.time()))[-4:]}" if pieces > 1 else ""
-                    
-                    # Create new item with required fields
-                    new_item = {
-                        'id': item_id,
-                        'lot_id': lot_id,
-                        'description': row.get('description', ''),
-                        'source': row.get('source', ''),
-                        'origin': row.get('origin', ''),
-                        'weight': float(row.get('weight', 0)),
-                        'pieces': pieces,
-                        'purchase_price': float(row.get('purchase_price', 0)),
-                        'purchase_date': pd.Timestamp.now().strftime('%Y-%m-%d'),
-                        'status': row.get('status', 'In Stock'),
-                        'location': row.get('location', ''),
-                        'notes': row.get('notes', ''),
-                        'image_path': ''
-                    }
-                    
-                    # Add to DataFrame
-                    rough_inventory_df = pd.concat([rough_inventory_df, pd.DataFrame([new_item])], ignore_index=True)
-                    successful_imports += 1
-                    
-                    # Add a small delay to ensure unique timestamps for IDs
-                    time.sleep(0.01)
-                    
-                except Exception as e:
-                    continue
-            
-            # Save to Excel
-            rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-            
-            flash(f'Successfully imported {successful_imports} rough inventory items!', 'success')
-            return redirect(url_for('rough_inventory'))
-        else:
-            flash('Invalid file format. Please upload an Excel file (.xlsx or .xls)', 'error')
-            return redirect(url_for('rough_inventory'))
-    except Exception as e:
-        flash(f'Error uploading rough inventory: {str(e)}', 'error')
-        return redirect(url_for('rough_inventory'))
-
-@app.route('/dashboard')
-def dashboard():
-    """
-    Display a dashboard with key metrics and visualizations.
-    """
-    try:
-        # Prepare data for dashboard
-        inventory_stats = {}
-        sales_stats = {}
-        purchase_stats = {}
-        
-        # Get inventory statistics if file exists
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            inventory_stats = {
-                'total_items': len(inventory_df),
-                'total_carats': inventory_df['carats'].sum() if 'carats' in inventory_df.columns else 0,
-                'total_value': inventory_df['price'].sum() if 'price' in inventory_df.columns else 0
-            }
-        
-        # Get rough inventory statistics if file exists
-        rough_inventory_stats = {}
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            rough_inventory_stats = {
-                'total_items': len(rough_df),
-                'total_weight': rough_df['weight'].sum() if 'weight' in rough_df.columns else 0,
-                'total_value': rough_df['purchase_price'].sum() if 'purchase_price' in rough_df.columns else 0
-            }
-        
-        # Get sales statistics if file exists
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-            sales_stats = {
-                'total_sales': len(sales_df),
-                'total_amount': sales_df['Total Amount USD'].sum() if 'Total Amount USD' in sales_df.columns else 0
-            }
-        
-        # Get purchase statistics if file exists
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-            purchase_stats = {
-                'total_purchases': len(purchases_df),
-                'total_amount': purchases_df['Total Amount USD'].sum() if 'Total Amount USD' in purchases_df.columns else 0
-            }
-        
-        return render_template('dashboard.html', 
-                              inventory_stats=inventory_stats,
-                              rough_inventory_stats=rough_inventory_stats,
-                              sales_stats=sales_stats,
-                              purchase_stats=purchase_stats)
-    except Exception as e:
-        flash(f'Error loading dashboard: {str(e)}', 'error')
-        return render_template('dashboard.html', 
-                              inventory_stats={},
-                              rough_inventory_stats={},
-                              sales_stats={},
-                              purchase_stats={})
-
-@app.route('/sell', methods=['GET', 'POST'])
-def sell():
-    """
-    Handle diamond sales transactions.
-    """
-    try:
-        if request.method == 'POST':
-            # Get the diamond type from the form
-            diamond_type = request.form.get('diamond_type', 'polished')
-            
-            if diamond_type == 'polished':
-                # Process polished diamond sale
-                inventory_item_id = request.form.get('inventory_item')
-                customer_name = request.form.get('customer_name')
-                sale_price = float(request.form.get('sale_price'))
-                sale_date = request.form.get('sale_date')
-                notes = request.form.get('notes', '')
-                
-                # Update inventory status to 'Sold'
-                if os.path.exists(INVENTORY_FILE):
-                    inventory_df = pd.read_excel(INVENTORY_FILE)
-                    item_index = inventory_df[inventory_df['id'] == inventory_item_id].index
-                    
-                    if len(item_index) > 0:
-                        inventory_df.loc[item_index[0], 'status'] = 'Sold'
-                        inventory_df.to_excel(INVENTORY_FILE, index=False)
-                        
-                        # Record the sale in sales.xlsx
-                        if os.path.exists(os.path.join(DATA_DIR, 'sales.xlsx')):
-                            sales_df = pd.read_excel(os.path.join(DATA_DIR, 'sales.xlsx'))
-                        else:
-                            sales_df = pd.DataFrame(columns=['id', 'item_id', 'customer_name', 'sale_price', 'sale_date', 'notes', 'diamond_type'])
-                        
-                        # Create new sale record
-                        sale_id = f"S{int(time.time())}"
-                        new_sale = {
-                            'id': sale_id,
-                            'item_id': inventory_item_id,
-                            'customer_name': customer_name,
-                            'sale_price': sale_price,
-                            'sale_date': sale_date,
-                            'notes': notes,
-                            'diamond_type': 'polished'
-                        }
-                        
-                        sales_df = pd.concat([sales_df, pd.DataFrame([new_sale])], ignore_index=True)
-                        sales_df.to_excel(os.path.join(DATA_DIR, 'sales.xlsx'), index=False)
-                        
-                        flash('Polished diamond sale recorded successfully!', 'success')
-                    else:
-                        flash('Inventory item not found', 'error')
-                else:
-                    flash('Inventory file not found', 'error')
-            
-            elif diamond_type == 'rough':
-                # Process rough diamond sale
-                rough_item_id = request.form.get('rough_inventory_item')
-                customer_name = request.form.get('customer_name')
-                sale_price = float(request.form.get('sale_price'))
-                sale_date = request.form.get('sale_date')
-                notes = request.form.get('notes', '')
-                
-                # Update rough inventory status to 'Sold'
-                if os.path.exists(ROUGH_INVENTORY_FILE):
-                    rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-                    item_index = rough_inventory_df[rough_inventory_df['id'] == rough_item_id].index
-                    
-                    if len(item_index) > 0:
-                        rough_inventory_df.loc[item_index[0], 'status'] = 'Sold'
-                        rough_inventory_df.to_excel(ROUGH_INVENTORY_FILE, index=False)
-                        
-                        # Record the sale in sales.xlsx
-                        if os.path.exists(os.path.join(DATA_DIR, 'sales.xlsx')):
-                            sales_df = pd.read_excel(os.path.join(DATA_DIR, 'sales.xlsx'))
-                        else:
-                            sales_df = pd.DataFrame(columns=['id', 'item_id', 'customer_name', 'sale_price', 'sale_date', 'notes', 'diamond_type'])
-                        
-                        # Create new sale record
-                        sale_id = f"S{int(time.time())}"
-                        new_sale = {
-                            'id': sale_id,
-                            'item_id': rough_item_id,
-                            'customer_name': customer_name,
-                            'sale_price': sale_price,
-                            'sale_date': sale_date,
-                            'notes': notes,
-                            'diamond_type': 'rough'
-                        }
-                        
-                        sales_df = pd.concat([sales_df, pd.DataFrame([new_sale])], ignore_index=True)
-                        sales_df.to_excel(os.path.join(DATA_DIR, 'sales.xlsx'), index=False)
-                        
-                        flash('Rough diamond sale recorded successfully!', 'success')
-                    else:
-                        flash('Rough inventory item not found', 'error')
-                else:
-                    flash('Rough inventory file not found', 'error')
-            
-            return redirect(url_for('sell'))
-        
-        # For GET requests, display the sell form
-        # Load polished inventory for selection
-        inventory_items = []
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            inventory_df = inventory_df[inventory_df['status'] == 'In Stock']
-            
-            for _, row in inventory_df.iterrows():
-                item = {
-                    'id': row.get('id', ''),
-                    'description': row.get('description', ''),
-                    'shape': row.get('shape', ''),
-                    'carats': row.get('carats', 0),
-                    'color': row.get('color', ''),
-                    'clarity': row.get('clarity', ''),
-                    'market_value': row.get('market_value', 0)
-                }
-                inventory_items.append(item)
-        
-        # Load rough inventory for selection
-        rough_inventory_items = []
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            rough_inventory_df = rough_inventory_df[rough_inventory_df['status'] == 'In Stock']
-            
-            for _, row in rough_inventory_df.iterrows():
-                item = {
-                    'id': row.get('id', ''),
-                    'description': row.get('description', ''),
-                    'weight': row.get('weight', 0),
-                    'rough_id': row.get('rough_id', ''),
-                    'kapan_no': row.get('kapan_no', ''),
-                    'purchase_price': row.get('purchase_price', 0)
-                }
-                rough_inventory_items.append(item)
-        
-        return render_template('sell.html', 
-                              inventory_items=inventory_items,
-                              rough_inventory_items=rough_inventory_items,
-                              today_date=datetime.now().strftime('%Y-%m-%d'))
-    except Exception as e:
-        flash(f'Error loading sell page: {str(e)}', 'error')
-        return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
-
-@app.route('/records')
-def records():
-    """
-    Display transaction records.
-    """
-    try:
-        # Prepare data for records page
-        purchases = []
-        sales = []
-        
-        # Get purchase records if file exists
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-            for _, row in purchases_df.iterrows():
-                purchase = {
-                    'id': row.get('id', ''),
-                    'date': row.get('Date', ''),
-                    'party': row.get('Party', ''),
-                    'description': row.get('Description', ''),
-                    'carat': row.get('Carat', 0),
-                    'amount_usd': row.get('Total Amount USD', 0),
-                    'amount_inr': row.get('Total Amount INR', 0),
-                    'payment_status': row.get('Payment Status', '')
-                }
-                purchases.append(purchase)
-        
-        # Get sales records if file exists
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-            for _, row in sales_df.iterrows():
-                sale = {
-                    'id': row.get('id', ''),
-                    'date': row.get('Date', ''),
-                    'party': row.get('Party', ''),
-                    'description': row.get('Description', ''),
-                    'carat': row.get('Carat', 0),
-                    'amount_usd': row.get('Total Amount USD', 0),
-                    'amount_inr': row.get('Total Amount INR', 0),
-                    'payment_status': row.get('Payment Status', '')
-                }
-                sales.append(sale)
-        
-        return render_template('records.html', purchases=purchases, sales=sales)
-    except Exception as e:
-        flash(f'Error loading records: {str(e)}', 'error')
-        return render_template('records.html', purchases=[], sales=[])
-
-@app.route('/payments')
-def payments():
-    """
-    Display payment records.
-    """
-    try:
-        # Prepare data for payments page
-        payments_list = []
-        
-        # Get payment records if file exists
-        if os.path.exists(PAYMENTS_FILE):
-            payments_df = pd.read_excel(PAYMENTS_FILE)
-            for _, row in payments_df.iterrows():
-                payment = {
-                    'id': row.get('id', ''),
-                    'date': row.get('Date', ''),
-                    'party': row.get('Party', ''),
-                    'description': row.get('Description', ''),
-                    'amount_usd': row.get('Amount USD', 0),
-                    'amount_inr': row.get('Amount INR', 0),
-                    'payment_method': row.get('Payment Method', ''),
-                    'reference': row.get('Reference', '')
-                }
-                payments_list.append(payment)
-        
-        return render_template('payments.html', payments=payments_list)
-    except Exception as e:
-        flash(f'Error loading payments: {str(e)}', 'error')
-        return render_template('payments.html', payments=[])
-
-@app.route('/reports')
-def reports():
-    """
-    Display business reports.
-    """
-    try:
-        # Prepare data for reports page
-        report_data = {
-            'total_inventory_value': 0,
-            'total_inventory_carats': 0,
-            'total_rough_inventory_value': 0,
-            'total_rough_inventory_weight': 0,
-            'total_purchases': 0,
-            'total_sales': 0,
-            'profit_margin': 0
-        }
-        
-        # Get inventory statistics if file exists
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-            report_data['total_inventory_value'] = inventory_df['price'].sum() if 'price' in inventory_df.columns else 0
-            report_data['total_inventory_carats'] = inventory_df['carats'].sum() if 'carats' in inventory_df.columns else 0
-        
-        # Get rough inventory statistics if file exists
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-            report_data['total_rough_inventory_value'] = rough_df['purchase_price'].sum() if 'purchase_price' in rough_df.columns else 0
-            report_data['total_rough_inventory_weight'] = rough_df['weight'].sum() if 'weight' in rough_df.columns else 0
-        
-        # Get purchase statistics if file exists
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-            report_data['total_purchases'] = purchases_df['Total Amount USD'].sum() if 'Total Amount USD' in purchases_df.columns else 0
-        
-        # Get sales statistics if file exists
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-            report_data['total_sales'] = sales_df['Total Amount USD'].sum() if 'Total Amount USD' in sales_df.columns else 0
-        
-        # Calculate profit margin
-        if report_data['total_sales'] > 0 and report_data['total_purchases'] > 0:
-            report_data['profit_margin'] = ((report_data['total_sales'] - report_data['total_purchases']) / report_data['total_purchases']) * 100
-        
-        return render_template('reports.html', report_data=report_data)
-    except Exception as e:
-        flash(f'Error loading reports: {str(e)}', 'error')
-        return render_template('reports.html', report_data={})
-
-@app.route('/add_rough_inventory')
-def add_rough_inventory():
-    return render_template('add_rough_inventory_item.html')
-
-@app.route('/backup', methods=['GET', 'POST'])
-def backup():
-    """
-    Handle backup and restore operations.
-    """
-    try:
-        logger.info(f"Backup route accessed: {request.method}")
-        
-        if request.method == 'POST':
-            action = request.form.get('action')
-            logger.info(f"Backup action: {action}")
-            
-            # Check if this is an AJAX request
-            is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-            
-            if action == 'create_backup':
-                # Create a new backup
-                backup_file = create_backup()
-                if backup_file:
-                    if is_ajax:
-                        return jsonify({
-                            'success': True,
-                            'message': f'Backup created successfully: {os.path.basename(backup_file)}'
-                        })
-                    else:
-                        flash(f'Backup created successfully: {os.path.basename(backup_file)}', 'success')
-                else:
-                    if is_ajax:
-                        return jsonify({
-                            'success': False,
-                            'message': 'Error creating backup'
-                        })
-                    else:
-                        flash('Error creating backup', 'error')
-            
-            elif action == 'restore_backup':
-                # Restore from a selected backup
-                backup_file = request.form.get('backup_file')
-                if backup_file:
-                    backup_path = os.path.join(BACKUP_DIR, backup_file)
-                    if os.path.exists(backup_path):
-                        if restore_from_backup(backup_path):
-                            if is_ajax:
-                                return jsonify({
-                                    'success': True,
-                                    'message': f'Data restored successfully from {backup_file}'
-                                })
-                            else:
-                                flash(f'Data restored successfully from {backup_file}', 'success')
-                        else:
-                            if is_ajax:
-                                return jsonify({
-                                    'success': False,
-                                    'message': f'Error restoring from {backup_file}'
-                                })
-                            else:
-                                flash(f'Error restoring from {backup_file}', 'error')
-                    else:
-                        if is_ajax:
-                            return jsonify({
-                                'success': False,
-                                'message': 'Backup file not found'
-                            })
-                        else:
-                            flash('Backup file not found', 'error')
-                else:
-                    if is_ajax:
-                        return jsonify({
-                            'success': False,
-                            'message': 'No backup file selected',
-                            'errors': {'backup_file': 'Please select a backup file'}
-                        })
-                    else:
-                        flash('No backup file selected', 'error')
-        
-        # Get list of available backups
-        backup_files = []
-        if os.path.exists(BACKUP_DIR):
-            backup_files = sorted([f for f in os.listdir(BACKUP_DIR) 
-                                if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
-                                key=lambda x: os.path.getmtime(os.path.join(BACKUP_DIR, x)),
-                                reverse=True)
-        
-        return render_template('backup.html', backup_files=backup_files, data_dir=DATA_DIR)
-    except Exception as e:
-        # Log the error for debugging
-        print(f"Error in backup route: {str(e)}")
-        
-        # Check if this is an AJAX request
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({
-                'success': False,
-                'message': f'An unexpected error occurred: {str(e)}'
-            })
-        
-        # Show a user-friendly error message
-        flash(f'An unexpected error occurred: {str(e)}', 'error')
-        return render_template('backup.html', backup_files=[], data_dir=DATA_DIR)
-
-# Function to validate data consistency across files
-def validate_data_consistency():
-    """
-    Validate data consistency across files.
-    Ensures that references between files are valid.
-    Returns a list of inconsistencies found.
-    """
-    inconsistencies = []
-    
-    try:
-        # Load all data files
-        inventory_df = pd.DataFrame()
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-        
-        rough_inventory_df = pd.DataFrame()
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-        
-        purchases_df = pd.DataFrame()
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-        
-        sales_df = pd.DataFrame()
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-        
-        payments_df = pd.DataFrame()
-        if os.path.exists(PAYMENTS_FILE):
-            payments_df = pd.read_excel(PAYMENTS_FILE)
-        
-        # Check if item IDs in sales exist in inventory
-        if not sales_df.empty and not inventory_df.empty and 'item_id' in sales_df.columns:
-            for _, row in sales_df.iterrows():
-                item_id = row.get('item_id')
-                if item_id and item_id not in inventory_df['id'].values and item_id not in rough_inventory_df['id'].values:
-                    inconsistencies.append(f"Item ID {item_id} in sales does not exist in inventory")
-        
-        # Check if rough IDs in inventory exist in rough inventory
-        if not inventory_df.empty and not rough_inventory_df.empty and 'rough_id' in inventory_df.columns:
-            for _, row in inventory_df.iterrows():
-                rough_id = row.get('rough_id')
-                if rough_id and rough_id not in rough_inventory_df['id'].values and rough_id != '':
-                    inconsistencies.append(f"Rough ID {rough_id} in inventory does not exist in rough inventory")
-        
-        # Check if item IDs in purchases exist in inventory
-        if not purchases_df.empty and not inventory_df.empty and 'item_id' in purchases_df.columns:
-            for _, row in purchases_df.iterrows():
-                item_id = row.get('item_id')
-                diamond_type = row.get('diamond_type')
-                
-                if item_id and diamond_type == 'polished' and item_id not in inventory_df['id'].values:
-                    inconsistencies.append(f"Item ID {item_id} in purchases (polished) does not exist in inventory")
-                elif item_id and diamond_type == 'rough' and item_id not in rough_inventory_df['id'].values:
-                    inconsistencies.append(f"Item ID {item_id} in purchases (rough) does not exist in rough inventory")
-        
-        return inconsistencies
-    except Exception as e:
-        inconsistencies.append(f"Error validating data consistency: {str(e)}")
-        return inconsistencies
-
-# Function to fix data inconsistencies
-def fix_data_inconsistencies():
-    """
-    Fix data inconsistencies across files.
-    Removes invalid references between files.
-    Returns the number of inconsistencies fixed.
-    """
-    fixed_count = 0
-    
-    try:
-        # Load all data files
-        inventory_df = pd.DataFrame()
-        if os.path.exists(INVENTORY_FILE):
-            inventory_df = pd.read_excel(INVENTORY_FILE)
-        
-        rough_inventory_df = pd.DataFrame()
-        if os.path.exists(ROUGH_INVENTORY_FILE):
-            rough_inventory_df = pd.read_excel(ROUGH_INVENTORY_FILE)
-        
-        purchases_df = pd.DataFrame()
-        if os.path.exists(PURCHASES_FILE):
-            purchases_df = pd.read_excel(PURCHASES_FILE)
-        
-        sales_df = pd.DataFrame()
-        if os.path.exists(SALES_FILE):
-            sales_df = pd.read_excel(SALES_FILE)
-        
-        payments_df = pd.DataFrame()
-        if os.path.exists(PAYMENTS_FILE):
-            payments_df = pd.read_excel(PAYMENTS_FILE)
-        
-        # Fix invalid rough IDs in inventory
-        if not inventory_df.empty and not rough_inventory_df.empty and 'rough_id' in inventory_df.columns:
-            valid_rough_ids = set(rough_inventory_df['id'].values) if 'id' in rough_inventory_df.columns else set()
-            for idx, row in inventory_df.iterrows():
-                rough_id = row.get('rough_id')
-                if rough_id and rough_id not in valid_rough_ids and rough_id != '':
-                    inventory_df.at[idx, 'rough_id'] = ''
-                    fixed_count += 1
-            
-            if fixed_count > 0:
-                inventory_df.to_excel(INVENTORY_FILE, index=False)
-                print(f"Fixed {fixed_count} invalid rough IDs in inventory")
-        
-        # Fix invalid item IDs in sales
-        if not sales_df.empty and ('item_id' in sales_df.columns):
-            valid_inventory_ids = set(inventory_df['id'].values) if not inventory_df.empty and 'id' in inventory_df.columns else set()
-            valid_rough_ids = set(rough_inventory_df['id'].values) if not rough_inventory_df.empty and 'id' in rough_inventory_df.columns else set()
-            valid_ids = valid_inventory_ids.union(valid_rough_ids)
-            
-            invalid_rows = []
-            for idx, row in sales_df.iterrows():
-                item_id = row.get('item_id')
-                if item_id and item_id not in valid_ids:
-                    invalid_rows.append(idx)
-            
-            if invalid_rows:
-                sales_df = sales_df.drop(invalid_rows)
-                sales_df.to_excel(SALES_FILE, index=False)
-                fixed_count += len(invalid_rows)
-                print(f"Removed {len(invalid_rows)} sales records with invalid item IDs")
-        
-        # Fix invalid item IDs in purchases
-        if not purchases_df.empty and ('item_id' in purchases_df.columns) and ('diamond_type' in purchases_df.columns):
-            valid_inventory_ids = set(inventory_df['id'].values) if not inventory_df.empty and 'id' in inventory_df.columns else set()
-            valid_rough_ids = set(rough_inventory_df['id'].values) if not rough_inventory_df.empty and 'id' in rough_inventory_df.columns else set()
-            
-            invalid_rows = []
-            for idx, row in purchases_df.iterrows():
-                item_id = row.get('item_id')
-                diamond_type = row.get('diamond_type')
-                
-                if item_id:
-                    if diamond_type == 'polished' and item_id not in valid_inventory_ids:
-                        invalid_rows.append(idx)
-                    elif diamond_type == 'rough' and item_id not in valid_rough_ids:
-                        invalid_rows.append(idx)
-            
-            if invalid_rows:
-                purchases_df = purchases_df.drop(invalid_rows)
-                purchases_df.to_excel(PURCHASES_FILE, index=False)
-                fixed_count += len(invalid_rows)
-                print(f"Removed {len(invalid_rows)} purchase records with invalid item IDs")
-        
-        return fixed_count
-    except Exception as e:
-        print(f"Error fixing data inconsistencies: {str(e)}")
-        return fixed_count
-
-# Function to schedule backups at regular intervals
-def schedule_backups(interval_hours=24):
-    """
-    Schedule backups at regular intervals.
-    Args:
-        interval_hours: Interval in hours between backups.
-    """
-    def backup_task():
-        while True:
-            try:
-                # Create a backup
-                backup_file = create_backup()
-                if backup_file:
-                    print(f"Scheduled backup created: {os.path.basename(backup_file)}")
-                else:
-                    print("Failed to create scheduled backup")
-                
-                # Sleep for the specified interval
-                time.sleep(interval_hours * 3600)
-            except Exception as e:
-                print(f"Error in scheduled backup: {str(e)}")
-                # Sleep for a shorter interval before retrying
-                time.sleep(3600)
-    
-    # Start the backup task in a background thread
-    backup_thread = threading.Thread(target=backup_task, daemon=True)
-    backup_thread.start()
-    print(f"Scheduled backups every {interval_hours} hours")
-
-@app.route('/debug/responsive', methods=['GET'])
-def debug_responsive():
-    """
-    Debug route for responsive design testing.
-    Only available in debug mode.
-    """
-    if not app.debug:
-        return render_template('error.html', 
-                              error_code=403, 
-                              error_message="This debugging tool is only available in debug mode."), 403
-    
-    logger.info("Responsive design testing tool accessed")
-    return render_template('debug_responsive.html')
-
 if __name__ == '__main__':
-    # Validate data consistency
-    try:
-        inconsistencies = validate_data_consistency()
-        if inconsistencies:
-            print("Data inconsistencies found:")
-            for inconsistency in inconsistencies:
-                print(f"  - {inconsistency}")
-            
-            # Fix data inconsistencies
-            fixed_count = fix_data_inconsistencies()
-            if fixed_count > 0:
-                print(f"Fixed {fixed_count} data inconsistencies")
-                
-                # Validate again after fixing
-                inconsistencies = validate_data_consistency()
-                if inconsistencies:
-                    print("Remaining data inconsistencies:")
-                    for inconsistency in inconsistencies:
-                        print(f"  - {inconsistency}")
-                else:
-                    print("All data inconsistencies fixed successfully")
-        else:
-            print("No data inconsistencies found")
-    except Exception as e:
-        print(f"Error validating data consistency: {str(e)}")
-    
-    # Fix data type inconsistencies
-    try:
-        if fix_data_types():
-            print("Data type inconsistencies fixed successfully")
-        else:
-            print("Failed to fix data type inconsistencies")
-    except Exception as e:
-        print(f"Error fixing data type inconsistencies: {str(e)}")
-    
-    # Create a backup when the application starts
-    try:
-        backup_file = create_backup()
-        if backup_file:
-            print(f"Automatic backup created: {os.path.basename(backup_file)}")
-        else:
-            print("Failed to create automatic backup")
-    except Exception as e:
-        print(f"Error creating automatic backup: {str(e)}")
-    
-    # Schedule backups every 6 hours
-    schedule_backups(interval_hours=6)
-    
-    # Run the application
     app.run(debug=True) 

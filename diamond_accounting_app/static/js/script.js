@@ -1,61 +1,5 @@
 // Wait for the DOM to be fully loaded
-// Debug configuration
-const DEBUG = {
-    enabled: true,  // Set to false in production
-    logLevel: 'debug',  // 'debug', 'info', 'warn', 'error'
-    
-    // Custom logging functions
-    debug: function(message, data) {
-        if (this.enabled && ['debug'].includes(this.logLevel)) {
-            console.debug(`[DEBUG] ${message}`, data || '');
-        }
-    },
-    
-    info: function(message, data) {
-        if (this.enabled && ['debug', 'info'].includes(this.logLevel)) {
-            console.info(`[INFO] ${message}`, data || '');
-        }
-    },
-    
-    warn: function(message, data) {
-        if (this.enabled && ['debug', 'info', 'warn'].includes(this.logLevel)) {
-            console.warn(`[WARN] ${message}`, data || '');
-        }
-    },
-    
-    error: function(message, data) {
-        if (this.enabled && ['debug', 'info', 'warn', 'error'].includes(this.logLevel)) {
-            console.error(`[ERROR] ${message}`, data || '');
-        }
-    },
-    
-    // Performance monitoring
-    startTimer: function(label) {
-        if (this.enabled) {
-            console.time(label);
-        }
-    },
-    
-    endTimer: function(label) {
-        if (this.enabled) {
-            console.timeEnd(label);
-        }
-    },
-    
-    // DOM element inspection
-    inspectElement: function(selector, message) {
-        if (this.enabled) {
-            const element = document.querySelector(selector);
-            console.log(`[INSPECT] ${message || selector}:`, element);
-            return element;
-        }
-    }
-};
-
 document.addEventListener('DOMContentLoaded', function() {
-    DEBUG.info('DOM fully loaded');
-    DEBUG.startTimer('Page Initialization');
-    
     // Toggle sidebar
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
@@ -121,60 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Enhanced form validation with detailed error messages
+    // Handle form submission with validation
     const forms = document.querySelectorAll('.needs-validation');
     if (forms.length > 0) {
         Array.from(forms).forEach(form => {
-            // Add input event listeners for real-time validation feedback
-            const inputs = form.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    // Clear previous error messages
-                    const feedbackElement = this.nextElementSibling;
-                    if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
-                        if (this.checkValidity()) {
-                            feedbackElement.textContent = '';
-                        }
-                    }
-                    
-                    // Add custom validation for specific input types
-                    if (this.type === 'number' && this.hasAttribute('min')) {
-                        const min = parseFloat(this.getAttribute('min'));
-                        const value = parseFloat(this.value);
-                        if (!isNaN(value) && value < min) {
-                            this.setCustomValidity(`Value must be at least ${min}`);
-                        } else {
-                            this.setCustomValidity('');
-                        }
-                    }
-                });
-            });
-            
-            // Form submission validation
             form.addEventListener('submit', event => {
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
-                    
-                    // Show detailed error messages for each invalid field
-                    const invalidInputs = form.querySelectorAll(':invalid');
-                    invalidInputs.forEach(input => {
-                        const feedbackElement = input.nextElementSibling;
-                        if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
-                            if (input.validity.valueMissing) {
-                                feedbackElement.textContent = 'This field is required';
-                            } else if (input.validity.typeMismatch) {
-                                feedbackElement.textContent = 'Please enter a valid format';
-                            } else if (input.validity.rangeUnderflow) {
-                                feedbackElement.textContent = `Value must be at least ${input.min}`;
-                            } else if (input.validity.rangeOverflow) {
-                                feedbackElement.textContent = `Value must be at most ${input.max}`;
-                            }
-                        }
-                        
-                        // Scroll to the first invalid element
-                        invalidInputs[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    });
                 }
                 form.classList.add('was-validated');
             }, false);
@@ -195,155 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     closeButton.click();
                 }
             }, 5000);
-        });
-    }
-
-    // AJAX form submission with error handling
-    const ajaxForms = document.querySelectorAll('form[data-ajax="true"]');
-    if (ajaxForms.length > 0) {
-        DEBUG.info(`Found ${ajaxForms.length} AJAX forms`);
-        
-        ajaxForms.forEach((form, index) => {
-            DEBUG.debug(`Initializing AJAX form #${index + 1}`, form);
-            
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                DEBUG.info(`AJAX form submitted: ${form.id || 'unnamed form'}`);
-                DEBUG.startTimer(`AJAX request: ${form.id || 'unnamed form'}`);
-                
-                // Show loading indicator
-                const submitButton = form.querySelector('button[type="submit"]');
-                const originalButtonText = submitButton.innerHTML;
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-                
-                // Clear previous error messages
-                const errorContainer = form.querySelector('.ajax-error');
-                if (errorContainer) {
-                    errorContainer.textContent = '';
-                    errorContainer.style.display = 'none';
-                }
-                
-                // Collect form data
-                const formData = new FormData(form);
-                
-                // Log form data for debugging
-                if (DEBUG.enabled) {
-                    DEBUG.debug('Form data:', {});
-                    for (let [key, value] of formData.entries()) {
-                        DEBUG.debug(`  ${key}: ${value}`);
-                    }
-                }
-                
-                // Send AJAX request
-                fetch(form.action, {
-                    method: form.method,
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    DEBUG.debug(`Response status: ${response.status}`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Server responded with status: ${response.status}`);
-                    }
-                    
-                    // Check if response is JSON
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        return response.json();
-                    } else {
-                        throw new Error('Expected JSON response but got: ' + contentType);
-                    }
-                })
-                .then(data => {
-                    DEBUG.debug('Response data:', data);
-                    
-                    // Handle successful response
-                    if (data.success) {
-                        DEBUG.info('Request successful');
-                        
-                        // Show success message
-                        if (data.message) {
-                            // Create a flash message
-                            const flashContainer = document.getElementById('flash-messages');
-                            if (flashContainer) {
-                                const alertDiv = document.createElement('div');
-                                alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                                alertDiv.role = 'alert';
-                                alertDiv.innerHTML = `
-                                    ${data.message}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                `;
-                                flashContainer.appendChild(alertDiv);
-                                
-                                // Auto-close after 5 seconds
-                                setTimeout(() => {
-                                    const closeButton = alertDiv.querySelector('.btn-close');
-                                    if (closeButton) {
-                                        closeButton.click();
-                                    }
-                                }, 5000);
-                            }
-                        }
-                        
-                        // Redirect if specified
-                        if (data.redirect) {
-                            DEBUG.info(`Redirecting to: ${data.redirect}`);
-                            window.location.href = data.redirect;
-                        } else if (form.dataset.resetOnSuccess === 'true') {
-                            // Reset form if specified
-                            DEBUG.info('Resetting form');
-                            form.reset();
-                        }
-                    } else {
-                        DEBUG.warn('Request returned success: false', data);
-                        
-                        // Handle validation errors
-                        if (data.errors) {
-                            DEBUG.warn('Validation errors:', data.errors);
-                            
-                            // Display field-specific errors
-                            Object.keys(data.errors).forEach(field => {
-                                const input = form.querySelector(`[name="${field}"]`);
-                                if (input) {
-                                    input.classList.add('is-invalid');
-                                    const feedbackElement = input.nextElementSibling;
-                                    if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
-                                        feedbackElement.textContent = data.errors[field];
-                                    }
-                                } else {
-                                    DEBUG.error(`Field not found: ${field}`);
-                                }
-                            });
-                        }
-                        
-                        // Display general error message
-                        if (data.message && errorContainer) {
-                            errorContainer.textContent = data.message;
-                            errorContainer.style.display = 'block';
-                        }
-                    }
-                })
-                .catch(error => {
-                    DEBUG.error('Error submitting form:', error);
-                    
-                    // Display error message
-                    if (errorContainer) {
-                        errorContainer.textContent = 'An error occurred while processing your request. Please try again.';
-                        errorContainer.style.display = 'block';
-                    }
-                })
-                .finally(() => {
-                    // Restore submit button
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = originalButtonText;
-                    
-                    DEBUG.endTimer(`AJAX request: ${form.id || 'unnamed form'}`);
-                });
-            });
         });
     }
 

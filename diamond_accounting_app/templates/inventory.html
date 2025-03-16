@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Polished Inventory - Shree Dangigev Diamonds{% endblock %}
+{% block title %}Inventory Management - Shree Dangigev Diamonds{% endblock %}
 
-{% block page_title %}Polished Inventory{% endblock %}
+{% block page_title %}Inventory Management{% endblock %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item active">Polished Inventory</li>
+<li class="breadcrumb-item active">Inventory</li>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Polished Inventory Overview Cards -->
+    <!-- Inventory Overview Cards -->
     <div class="row">
         <div class="col-xl-3 col-sm-6 mb-4">
             <div class="card">
@@ -102,18 +102,20 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                    <h6>Polished Diamond Inventory</h6>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#filterModal">
-                            <i class="fas fa-filter"></i> Filter
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#uploadInventoryModal">
-                            <i class="fas fa-file-upload"></i> Upload Excel
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addItemModal">
-                            <i class="fas fa-plus"></i> Add Item
-                        </button>
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6>Diamond Inventory</h6>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info me-2" data-bs-toggle="modal" data-bs-target="#uploadInventoryModal">
+                                <i class="fas fa-file-upload"></i> Upload Excel
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -197,7 +199,7 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header pb-0">
-                    <h6>Polished Inventory by Shape</h6>
+                    <h6>Inventory by Shape</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="chart-container" style="position: relative; height:240px; width:100%">
@@ -209,7 +211,7 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header pb-0">
-                    <h6>Polished Inventory by Clarity</h6>
+                    <h6>Inventory by Clarity</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="chart-container" style="position: relative; height:240px; width:100%">
@@ -226,7 +228,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addItemModalLabel">Add New Polished Inventory Item</h5>
+                <h5 class="modal-title" id="addItemModalLabel">Add New Inventory Item</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -355,7 +357,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="filterModalLabel">Filter Polished Inventory</h5>
+                <h5 class="modal-title" id="filterModalLabel">Filter Inventory</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -418,7 +420,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadInventoryModalLabel">Upload Polished Inventory from Excel</h5>
+                <h5 class="modal-title" id="uploadInventoryModalLabel">Upload Inventory from Excel</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
