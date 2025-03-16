@@ -1,237 +1,139 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Responsive Design Testing - Debug - Shree Dangigev Diamonds{% endblock %}
+{% block title %}Responsive Design Testing{% endblock %}
 
-{% block page_title %}Responsive Design Testing Tool{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item active">Debug</li>
-<li class="breadcrumb-item active">Responsive Design Testing</li>
+{% block styles %}
+<style>
+    .device-frame {
+        border: 2px solid #ccc;
+        margin: 20px auto;
+        transition: all 0.3s ease;
+    }
+    
+    .controls {
+        margin: 20px;
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 5px;
+    }
+    
+    .device-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .device-button {
+        padding: 8px 16px;
+        background: #4F81BD;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .device-button:hover {
+        background: #385D8A;
+    }
+    
+    .custom-size {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    .custom-size input {
+        width: 80px;
+        padding: 5px;
+    }
+    
+    #preview-frame {
+        width: 100%;
+        height: 600px;
+        border: none;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>Debug Mode:</strong> This tool is only available in debug mode and should not be accessible in production.
-    </div>
+<div class="container">
+    <h1>Responsive Design Testing</h1>
     
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <h6>Responsive Design Testing</h6>
-                </div>
-                <div class="card-body">
-                    <p>Test your application's responsive design across different device sizes.</p>
-                    
-                    <div class="mb-4">
-                        <label for="pageUrl" class="form-label">Page URL to Test:</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="pageUrl" value="{{ request.args.get('url', url_for('index')) }}">
-                            <button class="btn btn-primary" id="loadUrlBtn">Load</button>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Device Presets</h6>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary me-2" id="showAllBtn">Show All</button>
-                                <button class="btn btn-sm btn-outline-secondary" id="hideAllBtn">Hide All</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="mobileSmall" checked data-width="320" data-height="568" data-device="iPhone SE">
-                                    <label class="form-check-label" for="mobileSmall">Mobile Small (320px)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="mobileMedium" checked data-width="375" data-height="667" data-device="iPhone 8">
-                                    <label class="form-check-label" for="mobileMedium">Mobile Medium (375px)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="mobileLarge" checked data-width="414" data-height="896" data-device="iPhone 11">
-                                    <label class="form-check-label" for="mobileLarge">Mobile Large (414px)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="tablet" checked data-width="768" data-height="1024" data-device="iPad">
-                                    <label class="form-check-label" for="tablet">Tablet (768px)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="laptop" checked data-width="1024" data-height="768" data-device="Laptop">
-                                    <label class="form-check-label" for="laptop">Laptop (1024px)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input device-toggle" type="checkbox" id="desktop" checked data-width="1440" data-height="900" data-device="Desktop">
-                                    <label class="form-check-label" for="desktop">Desktop (1440px)</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6>Custom Size</h6>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="customWidth" class="form-label">Width (px):</label>
-                                <input type="number" class="form-control" id="customWidth" value="1200" min="320" max="2560">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="customHeight" class="form-label">Height (px):</label>
-                                <input type="number" class="form-control" id="customHeight" value="800" min="320" max="1600">
-                            </div>
-                            <div class="col-md-4 mb-3 d-flex align-items-end">
-                                <button class="btn btn-primary w-100" id="addCustomBtn">Add Custom Size</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="controls">
+        <h3>Select Device Size</h3>
+        <div class="device-list">
+            <button class="device-button" data-width="360" data-height="640">Mobile (360x640)</button>
+            <button class="device-button" data-width="768" data-height="1024">Tablet (768x1024)</button>
+            <button class="device-button" data-width="1024" data-height="768">Tablet Landscape (1024x768)</button>
+            <button class="device-button" data-width="1280" data-height="800">Laptop (1280x800)</button>
+            <button class="device-button" data-width="1920" data-height="1080">Desktop (1920x1080)</button>
+        </div>
+        
+        <div class="custom-size">
+            <label>Custom Size:</label>
+            <input type="number" id="custom-width" placeholder="Width" min="320" max="3840">
+            <span>x</span>
+            <input type="number" id="custom-height" placeholder="Height" min="240" max="2160">
+            <button class="device-button" id="apply-custom">Apply</button>
+        </div>
+        
+        <div class="custom-size">
+            <label>Test URL:</label>
+            <input type="text" id="test-url" placeholder="Enter URL to test" style="width: 300px;">
+            <button class="device-button" id="load-url">Load</button>
         </div>
     </div>
     
-    <div id="frameContainer">
-        <!-- Frames will be added here by JavaScript -->
+    <div class="device-frame">
+        <iframe id="preview-frame" src="{{ url_for('main.index') }}"></iframe>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof DEBUG !== 'undefined') {
-            DEBUG.info('Responsive design testing page loaded');
-        }
-        
-        const frameContainer = document.getElementById('frameContainer');
-        const pageUrlInput = document.getElementById('pageUrl');
-        const loadUrlBtn = document.getElementById('loadUrlBtn');
-        const showAllBtn = document.getElementById('showAllBtn');
-        const hideAllBtn = document.getElementById('hideAllBtn');
-        const addCustomBtn = document.getElementById('addCustomBtn');
-        const deviceToggles = document.querySelectorAll('.device-toggle');
-        
-        // Function to create a frame
-        function createFrame(width, height, deviceName) {
-            const url = pageUrlInput.value;
-            
-            // Create frame container
-            const frameWrapper = document.createElement('div');
-            frameWrapper.className = 'card mb-4';
-            frameWrapper.dataset.device = deviceName;
-            
-            // Create frame header
-            const frameHeader = document.createElement('div');
-            frameHeader.className = 'card-header pb-0 d-flex justify-content-between align-items-center';
-            frameHeader.innerHTML = `
-                <h6>${deviceName} (${width}x${height})</h6>
-                <button class="btn btn-sm btn-outline-danger remove-frame-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Create frame body
-            const frameBody = document.createElement('div');
-            frameBody.className = 'card-body p-0';
-            
-            // Create iframe
-            const iframe = document.createElement('iframe');
-            iframe.src = url;
-            iframe.width = width;
-            iframe.height = height;
-            iframe.style.border = '1px solid #dee2e6';
-            iframe.style.maxWidth = '100%';
-            
-            // Assemble frame
-            frameBody.appendChild(iframe);
-            frameWrapper.appendChild(frameHeader);
-            frameWrapper.appendChild(frameBody);
-            
-            // Add remove button functionality
-            const removeBtn = frameWrapper.querySelector('.remove-frame-btn');
-            removeBtn.addEventListener('click', function() {
-                frameWrapper.remove();
-                
-                // Uncheck the corresponding toggle if it exists
-                deviceToggles.forEach(toggle => {
-                    if (toggle.dataset.device === deviceName) {
-                        toggle.checked = false;
-                    }
-                });
-            });
-            
-            return frameWrapper;
-        }
-        
-        // Function to update frames based on device toggles
-        function updateFrames() {
-            // Clear existing frames
-            frameContainer.innerHTML = '';
-            
-            // Add frames for checked devices
-            deviceToggles.forEach(toggle => {
-                if (toggle.checked) {
-                    const width = parseInt(toggle.dataset.width);
-                    const height = parseInt(toggle.dataset.height);
-                    const device = toggle.dataset.device;
-                    
-                    const frame = createFrame(width, height, device);
-                    frameContainer.appendChild(frame);
-                }
+document.addEventListener('DOMContentLoaded', function() {
+    const frame = document.getElementById('preview-frame');
+    const deviceButtons = document.querySelectorAll('.device-button');
+    const customWidth = document.getElementById('custom-width');
+    const customHeight = document.getElementById('custom-height');
+    const applyCustom = document.getElementById('apply-custom');
+    const testUrl = document.getElementById('test-url');
+    const loadUrl = document.getElementById('load-url');
+    
+    // Device preset buttons
+    deviceButtons.forEach(button => {
+        if (!button.id) {  // Skip custom buttons
+            button.addEventListener('click', () => {
+                const width = button.dataset.width;
+                const height = button.dataset.height;
+                frame.style.width = width + 'px';
+                frame.style.height = height + 'px';
+                customWidth.value = width;
+                customHeight.value = height;
             });
         }
-        
-        // Initialize frames
-        updateFrames();
-        
-        // Add event listeners for device toggles
-        deviceToggles.forEach(toggle => {
-            toggle.addEventListener('change', updateFrames);
-        });
-        
-        // Add event listener for load URL button
-        loadUrlBtn.addEventListener('click', function() {
-            updateFrames();
-        });
-        
-        // Add event listeners for show/hide all buttons
-        showAllBtn.addEventListener('click', function() {
-            deviceToggles.forEach(toggle => {
-                toggle.checked = true;
-            });
-            updateFrames();
-        });
-        
-        hideAllBtn.addEventListener('click', function() {
-            deviceToggles.forEach(toggle => {
-                toggle.checked = false;
-            });
-            updateFrames();
-        });
-        
-        // Add event listener for custom size button
-        addCustomBtn.addEventListener('click', function() {
-            const width = parseInt(document.getElementById('customWidth').value);
-            const height = parseInt(document.getElementById('customHeight').value);
-            
-            if (width && height) {
-                const deviceName = `Custom (${width}x${height})`;
-                const frame = createFrame(width, height, deviceName);
-                frameContainer.appendChild(frame);
-            }
-        });
     });
+    
+    // Custom size button
+    applyCustom.addEventListener('click', () => {
+        const width = customWidth.value;
+        const height = customHeight.value;
+        if (width && height) {
+            frame.style.width = width + 'px';
+            frame.style.height = height + 'px';
+        }
+    });
+    
+    // Load URL button
+    loadUrl.addEventListener('click', () => {
+        const url = testUrl.value;
+        if (url) {
+            frame.src = url;
+        }
+    });
+});
 </script>
 {% endblock %} 

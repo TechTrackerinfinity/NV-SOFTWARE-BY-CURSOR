@@ -3289,3 +3289,457 @@ werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.i
 2025-03-16 08:37:41,890 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
 2025-03-16 08:37:41,891 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
 2025-03-16 08:37:41,892 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_083741.zip
+2025-03-16 08:40:12,708 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:40:12,918 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:40:12,919 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084012.zip
+2025-03-16 08:40:12,950 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:40:12,973 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:40:12,997 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:40:12,997 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:40:12,998 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:40:12,999 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_003313.zip
+2025-03-16 08:40:12,999 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084012.zip
+2025-03-16 08:40:13,002 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:40:13,002 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084013.zip
+2025-03-16 08:40:13,004 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:40:13,004 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:40:13,005 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:40:13,006 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:40:13,007 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:40:13,008 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_003327.zip
+2025-03-16 08:40:13,008 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084013.zip
+2025-03-16 08:40:54,425 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:40:54,527 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:40:54,527 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084054.zip
+2025-03-16 08:40:54,550 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:40:54,567 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:40:54,587 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:40:54,587 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:40:54,587 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:40:54,588 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_003328.zip
+2025-03-16 08:40:54,588 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084054.zip
+2025-03-16 08:40:54,589 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:40:54,589 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084054.zip
+2025-03-16 08:40:54,590 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:40:54,590 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:40:54,591 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:40:54,591 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:40:54,591 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:40:54,592 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084054.zip
+2025-03-16 08:44:35,808 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:44:36,036 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:44:36,060 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084436.zip
+2025-03-16 08:44:36,079 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:44:36,092 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:44:36,108 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:44:36,108 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:44:36,109 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:44:36,109 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_003347.zip
+2025-03-16 08:44:36,109 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084436.zip
+2025-03-16 08:44:36,111 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:44:36,111 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084436.zip
+2025-03-16 08:44:36,113 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:44:36,113 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:44:36,114 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:44:36,114 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:44:36,115 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:44:36,115 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084436.zip
+2025-03-16 08:45:10,716 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:45:11,081 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:11,082 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084511.zip
+2025-03-16 08:45:11,105 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:11,122 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:11,140 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:11,141 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:11,141 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:11,142 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_005139.zip
+2025-03-16 08:45:11,142 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084511.zip
+2025-03-16 08:45:11,144 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:11,146 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084511.zip
+2025-03-16 08:45:11,147 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:11,148 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:11,149 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:11,150 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:11,150 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:11,154 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084511.zip
+2025-03-16 08:45:24,342 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:45:24,443 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:24,443 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084524.zip
+2025-03-16 08:45:24,464 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:24,479 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:24,490 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:24,491 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:24,491 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:24,493 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_005140.zip
+2025-03-16 08:45:24,493 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084524.zip
+2025-03-16 08:45:24,496 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:24,497 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084524.zip
+2025-03-16 08:45:24,498 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:24,502 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:24,524 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:24,524 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:24,524 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:24,525 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084524.zip
+2025-03-16 08:45:48,790 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:45:48,890 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:48,890 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084548.zip
+2025-03-16 08:45:48,908 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:48,921 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:48,934 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:48,935 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:48,935 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:48,936 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_083723.zip
+2025-03-16 08:45:48,936 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084548.zip
+2025-03-16 08:45:48,937 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:45:48,938 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084548.zip
+2025-03-16 08:45:48,938 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:45:48,939 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:45:48,940 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:45:48,941 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:45:48,941 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:45:48,942 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084548.zip
+2025-03-16 08:46:47,213 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:46:47,307 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:46:47,308 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084647.zip
+2025-03-16 08:46:47,323 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:46:47,333 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:46:47,347 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:46:47,347 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:46:47,348 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:46:47,349 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_083726.zip
+2025-03-16 08:46:47,349 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084647.zip
+2025-03-16 08:46:47,350 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:46:47,350 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084647.zip
+2025-03-16 08:46:47,351 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:46:47,353 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:46:47,355 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:46:47,355 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:46:47,358 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:46:47,359 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084647.zip
+2025-03-16 08:47:01,268 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:47:01,372 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:47:01,372 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084701.zip
+2025-03-16 08:47:01,388 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:47:01,399 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:47:01,412 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:47:01,412 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:47:01,412 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:47:01,413 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_083730.zip
+2025-03-16 08:47:01,413 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084701.zip
+2025-03-16 08:47:01,415 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:47:01,415 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084701.zip
+2025-03-16 08:47:01,418 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:47:01,419 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:47:01,419 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:47:01,419 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:47:01,420 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:47:01,421 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084701.zip
+2025-03-16 08:48:34,320 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:48:34,429 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:48:34,429 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084834.zip
+2025-03-16 08:48:34,449 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:48:34,467 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:48:34,485 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:48:34,485 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:48:34,485 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:48:34,486 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_083741.zip
+2025-03-16 08:48:34,486 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084834.zip
+2025-03-16 08:48:34,487 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:48:34,487 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084834.zip
+2025-03-16 08:48:34,489 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:48:34,489 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:48:34,489 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:48:34,490 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:48:34,490 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:48:34,491 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084834.zip
+2025-03-16 08:49:00,094 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:49:00,211 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:49:00,211 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084900.zip
+2025-03-16 08:49:00,231 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:49:00,257 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:49:00,279 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:49:00,279 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:49:00,279 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:49:00,280 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_084012.zip
+2025-03-16 08:49:00,280 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084900.zip
+2025-03-16 08:49:00,282 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:49:00,283 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084900.zip
+2025-03-16 08:49:00,283 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:49:00,284 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:49:00,284 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:49:00,285 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:49:00,285 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:49:00,286 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084900.zip
+2025-03-16 08:49:53,553 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:49:53,698 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:49:53,698 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084953.zip
+2025-03-16 08:49:53,716 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:49:53,728 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:49:53,742 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:49:53,742 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:49:53,743 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:49:53,744 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_084013.zip
+2025-03-16 08:49:53,744 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084953.zip
+2025-03-16 08:49:53,745 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:49:53,745 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_084953.zip
+2025-03-16 08:49:53,746 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:49:53,747 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:49:53,747 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:49:53,748 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:49:53,748 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:49:53,748 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_084953.zip
+2025-03-16 08:50:18,242 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:50:18,325 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:50:18,325 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_085018.zip
+2025-03-16 08:50:18,341 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:50:18,351 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:50:18,362 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:50:18,362 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:50:18,363 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:50:18,363 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_084054.zip
+2025-03-16 08:50:18,363 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_085018.zip
+2025-03-16 08:50:18,367 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:50:18,368 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_085018.zip
+2025-03-16 08:50:18,369 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:50:18,369 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:50:18,370 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:50:18,370 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:50:18,370 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:50:18,372 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_085018.zip
+2025-03-16 08:50:51,852 - diamond_app - INFO - Starting Diamond Accounting Application
+2025-03-16 08:50:51,939 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:50:51,939 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_085051.zip
+2025-03-16 08:50:51,956 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:50:51,968 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:50:51,978 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:50:51,978 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:50:51,979 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:50:51,979 - diamond_app - DEBUG - Removed old backup: diamond_data_backup_20250316_084436.zip
+2025-03-16 08:50:51,979 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_085051.zip
+2025-03-16 08:50:51,981 - diamond_app - INFO - Creating backup of all data files
+2025-03-16 08:50:51,982 - diamond_app - DEBUG - Backup file path: D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\data\backup\diamond_data_backup_20250316_085051.zip
+2025-03-16 08:50:51,982 - diamond_app - DEBUG - Added file to backup: purchases.xlsx
+2025-03-16 08:50:51,983 - diamond_app - DEBUG - Added file to backup: sales.xlsx
+2025-03-16 08:50:51,983 - diamond_app - DEBUG - Added file to backup: payments.xlsx
+2025-03-16 08:50:51,983 - diamond_app - DEBUG - Added file to backup: inventory.xlsx
+2025-03-16 08:50:51,983 - diamond_app - DEBUG - Added file to backup: rough_inventory.xlsx
+2025-03-16 08:50:51,983 - diamond_app - INFO - Backup created successfully: diamond_data_backup_20250316_085051.zip
+2025-03-16 08:51:18,649 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:18,650 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:18,654 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:18,654 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 08:51:28,747 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 08:51:44,607 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:44,607 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:44,608 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:44,609 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+

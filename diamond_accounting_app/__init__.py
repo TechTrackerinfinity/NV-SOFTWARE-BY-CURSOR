@@ -71,17 +71,23 @@ def create_app(config_name='default'):
         sales_bp,
         purchases_bp,
         reports_bp,
+        backup_bp,
         debug_bp
     )
     
+    # Register main blueprint without prefix
     app.register_blueprint(main_bp)
-    app.register_blueprint(inventory_bp, url_prefix='/inventory')
-    app.register_blueprint(sales_bp, url_prefix='/sales')
-    app.register_blueprint(purchases_bp, url_prefix='/purchases')
-    app.register_blueprint(reports_bp, url_prefix='/reports')
     
+    # Register feature blueprints with their respective prefixes
+    app.register_blueprint(inventory_bp)  # Routes already include /inventory prefix
+    app.register_blueprint(sales_bp)      # Routes already include /sales prefix
+    app.register_blueprint(purchases_bp)   # Routes already include /purchases prefix
+    app.register_blueprint(reports_bp)     # Routes already include /reports prefix
+    app.register_blueprint(backup_bp)      # Routes already include /backup prefix
+    
+    # Register debug blueprint only in debug mode
     if app.debug:
-        app.register_blueprint(debug_bp, url_prefix='/debug')
+        app.register_blueprint(debug_bp)   # Routes already include /debug prefix
     
     # Register error handlers
     register_error_handlers(app)

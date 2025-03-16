@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Diamond Accounting{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 mb-0">Dashboard</h1>
+        <p class="text-muted">Overview of your business metrics</p>
+    </div>
+    <div class="col-auto">
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Report
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="exportDashboard()">
+                <i class="fas fa-download me-2"></i>Export
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-gem fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Total Inventory Value</h6>
+                        <h3 class="mb-0">${{ "{:,.2f}".format(data.summary.total_inventory_value) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-line fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Total Sales</h6>
+                        <h3 class="mb-0">${{ "{:,.2f}".format(data.summary.total_sales) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-shopping-cart fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Total Purchases</h6>
+                        <h3 class="mb-0">${{ "{:,.2f}".format(data.summary.total_purchases) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h6 class="text-muted mb-1">Profit</h6>
+                        <h3 class="mb-0">${{ "{:,.2f}".format(data.summary.profit) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Monthly Trends</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyTrendsChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Payment Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="paymentStatusChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Row -->
+<div class="row g-3">
+    <!-- Inventory Metrics -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Inventory Metrics</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Total Items</span>
+                        <span class="badge bg-primary rounded-pill">{{ data.inventory.total_items }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Total Carats</span>
+                        <span class="badge bg-primary rounded-pill">{{ "{:.2f}".format(data.inventory.total_carats) }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Avg Price/Carat</span>
+                        <span class="badge bg-primary rounded-pill">${{ "{:,.2f}".format(data.inventory.avg_price_per_carat) }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sales Metrics -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Sales Metrics</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Total Sales</span>
+                        <span class="badge bg-success rounded-pill">{{ data.sales.total_sales_count }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Recent Sales (30d)</span>
+                        <span class="badge bg-success rounded-pill">{{ data.sales.recent_sales_count }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Avg Sale Value</span>
+                        <span class="badge bg-success rounded-pill">${{ "{:,.2f}".format(data.sales.avg_sale_value) }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Metrics -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Payment Metrics</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Total Payments</span>
+                        <span class="badge bg-info rounded-pill">${{ "{:,.2f}".format(data.payments.total_payments) }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Pending Payments</span>
+                        <span class="badge bg-warning rounded-pill">${{ "{:,.2f}".format(data.payments.pending_payments) }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Payment Ratio</span>
+                        <span class="badge bg-info rounded-pill">{{ "{:.1f}".format(data.payments.payment_ratio) }}%</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+// Monthly Trends Chart
+const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+new Chart(monthlyTrendsCtx, {
+    type: 'line',
+    data: {
+        labels: {{ data.charts.monthly_sales|map(attribute='month')|list|tojson }},
+        datasets: [{
+            label: 'Sales',
+            data: {{ data.charts.monthly_sales|map(attribute='value')|list|tojson }},
+            borderColor: 'rgb(40, 167, 69)',
+            tension: 0.1
+        }, {
+            label: 'Purchases',
+            data: {{ data.charts.monthly_purchases|map(attribute='value')|list|tojson }},
+            borderColor: 'rgb(255, 193, 7)',
+            tension: 0.1
+        }, {
+            label: 'Payments',
+            data: {{ data.charts.monthly_payments|map(attribute='value')|list|tojson }},
+            borderColor: 'rgb(23, 162, 184)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Payment Status Chart
+const paymentStatusCtx = document.getElementById('paymentStatusChart').getContext('2d');
+new Chart(paymentStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Paid', 'Pending'],
+        datasets: [{
+            data: [
+                {{ data.charts.payment_status.paid }},
+                {{ data.charts.payment_status.pending }}
+            ],
+            backgroundColor: [
+                'rgb(40, 167, 69)',
+                'rgb(255, 193, 7)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+function exportDashboard() {
+    const data = {{ data|tojson }};
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dashboard_data.json';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %} 

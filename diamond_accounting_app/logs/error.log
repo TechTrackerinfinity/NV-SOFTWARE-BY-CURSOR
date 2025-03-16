@@ -211,3 +211,222 @@ werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.i
     raise BuildError(endpoint, values, method, self)
 werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
 
+2025-03-16 08:51:18,649 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:18,650 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:18,654 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:18,654 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 08:51:28,747 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:28,749 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 08:51:44,607 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 08:51:44,607 - diamond_app - ERROR - Request: /sell GET
+2025-03-16 08:51:44,608 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 08:51:44,609 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2926, in sell
+    return render_template('sell.html',
+                          inventory_items=inventory_items,
+                          rough_inventory_items=rough_inventory_items,
+                          today_date=datetime.now().strftime('%Y-%m-%d'))
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 2932, in sell
+    return render_template('sell.html', inventory_items=[], rough_inventory_items=[])
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\sell.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 20, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
