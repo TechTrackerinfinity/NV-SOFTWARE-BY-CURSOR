@@ -1,0 +1,2081 @@
+{% extends 'base.html' %}
+
+{% block title %}Buy - Shree Dangigev Diamonds{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+    .required-field::after {
+        content: "*";
+        color: red;
+        margin-left: 4px;
+    }
+    .payment-pending {
+        color: #dc3545;
+    }
+    .payment-completed {
+        color: #28a745;
+    }
+    .section-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    .section-divider {
+        border-top: 1px solid #e9ecef;
+        margin: 1.5rem 0;
+        padding-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header">
+                <h3 class="text-center font-weight-light my-2">
+                    <i class="fas fa-shopping-cart me-2 text-primary"></i>Record Diamond Purchase
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Tabs for Polished and Rough Diamonds -->
+                <ul class="nav nav-tabs mb-4" id="diamondTypeTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="polished-tab" data-bs-toggle="tab" data-bs-target="#polished" type="button" role="tab" aria-controls="polished" aria-selected="true">
+                            <i class="fas fa-gem me-2"></i>Polished Diamond
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="rough-tab" data-bs-toggle="tab" data-bs-target="#rough" type="button" role="tab" aria-controls="rough" aria-selected="false">
+                            <i class="fas fa-cubes me-2"></i>Rough Diamond
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div class="tab-content" id="diamondTypeTabsContent">
+                    <!-- Polished Diamond Tab -->
+                    <div class="tab-pane fade show active" id="polished" role="tabpanel" aria-labelledby="polished-tab">
+                <form method="POST" action="{{ url_for('buy') }}">
+                            <input type="hidden" name="diamond_type" value="polished">
+                            
+                            <!-- Purchase Details Section -->
+                    <div class="section-title">
+                                <i class="fas fa-user me-2"></i>Party Details
+                    </div>
+                    
+                    <div class="row mb-3">
+                                <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_date" name="date" type="date" required value="{{ today_date }}">
+                                        <label for="polished_date" class="required-field">Date of Purchase</label>
+                            </div>
+                        </div>
+                                <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_party" name="party" type="text" placeholder="Party Name" required>
+                                        <label for="polished_party" class="required-field">Party Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_reference_party" name="reference_party" type="text" placeholder="Reference Party">
+                                        <label for="polished_reference_party">Reference Party</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_place_of_buy" name="place_of_buy" type="text" placeholder="Place of Buy">
+                                        <label for="polished_place_of_buy">Place of Buy</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Diamond Details Section -->
+                    <div class="section-divider"></div>
+                    <div class="section-title">
+                                <i class="fas fa-gem me-2"></i>Diamond Details
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_than" name="than" type="number" value="1" placeholder="THAN">
+                                        <label for="polished_than">THAN</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_shape_select" name="shape_select">
+                                            <option value="">Select Shape</option>
+                                            <option value="Round">Round</option>
+                                            <option value="Princess">Princess</option>
+                                            <option value="Cushion">Cushion</option>
+                                            <option value="Emerald">Emerald</option>
+                                            <option value="Oval">Oval</option>
+                                            <option value="Radiant">Radiant</option>
+                                            <option value="Asscher">Asscher</option>
+                                            <option value="Heart">Heart</option>
+                                            <option value="Marquise">Marquise</option>
+                                            <option value="Pear">Pear</option>
+                                            <option value="Other">Other</option>
+                                            <option value="RegisterNew">Register New Shape</option>
+                                            <option value="DeleteShape">Delete Shape</option>
+                                        </select>
+                                        <label for="polished_shape_select">Shape</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_custom_shape" name="custom_shape" type="text" placeholder="Custom Shape">
+                                        <label for="polished_custom_shape">Custom Shape Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_carat_detail" name="carat_detail" type="number" step="0.01" placeholder="Carat Weight" required>
+                                        <label for="polished_carat_detail" class="required-field">Carat Weight</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_color_type" name="color_type">
+                                            <option value="White">White</option>
+                                            <option value="Fancy">Fancy</option>
+                                        </select>
+                                        <label for="polished_color_type">Color Type</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="polished_white_color_container">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_white_color" name="white_color">
+                                            <option value="">Select Color</option>
+                                            <option value="D">D</option>
+                                            <option value="E">E</option>
+                                            <option value="F">F</option>
+                                            <option value="G">G</option>
+                                            <option value="H">H</option>
+                                            <option value="I">I</option>
+                                            <option value="J">J</option>
+                                            <option value="K">K</option>
+                                            <option value="L">L</option>
+                                            <option value="M">M</option>
+                                        </select>
+                                        <label for="polished_white_color">Color Grade</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="polished_fancy_color_container" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_fancy_color" name="fancy_color">
+                                            <option value="">Select Fancy Color</option>
+                                            <option value="Yellow">Yellow</option>
+                                            <option value="Pink">Pink</option>
+                                            <option value="Blue">Blue</option>
+                                            <option value="Green">Green</option>
+                                            <option value="Orange">Orange</option>
+                                            <option value="Purple">Purple</option>
+                                            <option value="Brown">Brown</option>
+                                            <option value="Black">Black</option>
+                                            <option value="Gray">Gray</option>
+                                            <option value="Red">Red</option>
+                                            <option value="Other">Other</option>
+                                            <option value="RegisterNew">Register New Color</option>
+                                            <option value="DeleteColor">Delete Color</option>
+                                        </select>
+                                        <label for="polished_fancy_color">Fancy Color</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="polished_custom_fancy_color_container" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_custom_fancy_color" name="custom_fancy_color" type="text" placeholder="Custom Fancy Color">
+                                        <label for="polished_custom_fancy_color">Custom Fancy Color</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="polished_fancy_intensity_container" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_fancy_intensity" name="fancy_intensity">
+                                            <option value="">Select Intensity</option>
+                                            <option value="Faint">Faint</option>
+                                            <option value="Very Light">Very Light</option>
+                                            <option value="Light">Light</option>
+                                            <option value="Fancy Light">Fancy Light</option>
+                                            <option value="Fancy">Fancy</option>
+                                            <option value="Fancy Intense">Fancy Intense</option>
+                                            <option value="Fancy Vivid">Fancy Vivid</option>
+                                            <option value="Fancy Deep">Fancy Deep</option>
+                                            <option value="Fancy Dark">Fancy Dark</option>
+                                        </select>
+                                        <label for="polished_fancy_intensity">Color Intensity</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_clarity_detail" name="clarity_detail">
+                                            <option value="">Select Clarity</option>
+                                            <option value="IF">IF</option>
+                                            <option value="VVS1">VVS1</option>
+                                            <option value="VVS2">VVS2</option>
+                                            <option value="VS1">VS1</option>
+                                            <option value="VS2">VS2</option>
+                                            <option value="SI1">SI1</option>
+                                            <option value="SI2">SI2</option>
+                                            <option value="I1">I1</option>
+                                            <option value="I2">I2</option>
+                                            <option value="I3">I3</option>
+                                        </select>
+                                        <label for="polished_clarity_detail">Clarity</label>
+                                    </div>
+                                </div>
+                    </div>
+                    
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_cut_detail" name="cut_detail">
+                                            <option value="">Select Cut</option>
+                                            <option value="Excellent">Excellent</option>
+                                            <option value="Very Good">Very Good</option>
+                                            <option value="Good">Good</option>
+                                            <option value="Fair">Fair</option>
+                                            <option value="Poor">Poor</option>
+                                        </select>
+                                        <label for="polished_cut_detail">Cut</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_polish_detail" name="polish_detail">
+                                            <option value="">Select Polish</option>
+                                            <option value="Excellent">Excellent</option>
+                                            <option value="Very Good">Very Good</option>
+                                            <option value="Good">Good</option>
+                                            <option value="Fair">Fair</option>
+                                            <option value="Poor">Poor</option>
+                                        </select>
+                                        <label for="polished_polish_detail">Polish</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_symmetry_detail" name="symmetry_detail">
+                                            <option value="">Select Symmetry</option>
+                                            <option value="Excellent">Excellent</option>
+                                            <option value="Very Good">Very Good</option>
+                                            <option value="Good">Good</option>
+                                            <option value="Fair">Fair</option>
+                                            <option value="Poor">Poor</option>
+                                        </select>
+                                        <label for="polished_symmetry_detail">Symmetry</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Certification Details Section -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_certificate" name="certificate">
+                                            <option value="">Select Certificate</option>
+                                            <option value="GIA">GIA</option>
+                                            <option value="IGI">IGI</option>
+                                            <option value="HRD">HRD</option>
+                                            <option value="AGS">AGS</option>
+                                            <option value="GCAL">GCAL</option>
+                                            <option value="GSI">GSI</option>
+                                            <option value="None">None</option>
+                                        </select>
+                                        <label for="polished_certificate">Certificate Type</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_certificate_number" name="certificate_number" type="text" placeholder="Certificate Number">
+                                        <label for="polished_certificate_number">Certificate Number</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- More Details Section -->
+                    <div class="section-divider"></div>
+                    <div class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>More Details
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_diamond_type" name="diamond_type">
+                                            <option value="">Select Type</option>
+                                            <option value="Natural">Natural</option>
+                                            <option value="Lab Grown">Lab Grown</option>
+                                        </select>
+                                        <label for="polished_diamond_type">Diamond Type</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="polished_growth_type_container" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_growth_type" name="growth_type">
+                                            <option value="">Select Growth Type</option>
+                                            <option value="CVD">CVD</option>
+                                            <option value="HPHT">HPHT</option>
+                                        </select>
+                                        <label for="polished_growth_type">Growth Type</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_treatment" name="treatment">
+                                            <option value="">Select Treatment</option>
+                                            <option value="None">None</option>
+                                            <option value="HPHT">HPHT</option>
+                                            <option value="Irradiated">Irradiated</option>
+                                            <option value="Laser Drilled">Laser Drilled</option>
+                                            <option value="Fracture Filled">Fracture Filled</option>
+                                        </select>
+                                        <label for="polished_treatment">Treatment</label>
+                                    </div>
+                                </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_measurements" name="measurements" type="text" placeholder="Measurements (e.g., 15*7.5*8.3)">
+                                        <label for="polished_measurements">Measurements (mm)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_table_percentage" name="table_percentage" type="number" step="0.1" placeholder="Table %">
+                                        <label for="polished_table_percentage">Table %</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_depth_percentage" name="depth_percentage" type="number" step="0.1" placeholder="Depth %">
+                                        <label for="polished_depth_percentage">Depth %</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_eye_clean" name="eye_clean">
+                                            <option value="">Select Eye Clean</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <label for="polished_eye_clean">Eye Clean</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_milky" name="milky">
+                                            <option value="">Select Milky</option>
+                                            <option value="None">None</option>
+                                            <option value="Slight">Slight</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Strong">Strong</option>
+                                        </select>
+                                        <label for="polished_milky">Milky</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_bgm" name="bgm">
+                                            <option value="">Select BGM</option>
+                                            <option value="None">None</option>
+                                            <option value="Slight">Slight</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Strong">Strong</option>
+                                        </select>
+                                        <label for="polished_bgm">BGM</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_fluorescence_color" name="fluorescence_color">
+                                            <option value="">Select Color</option>
+                                            <option value="None">None</option>
+                                            <option value="Blue">Blue</option>
+                                            <option value="Yellow">Yellow</option>
+                                            <option value="Green">Green</option>
+                                            <option value="Orange">Orange</option>
+                                            <option value="Red">Red</option>
+                                            <option value="White">White</option>
+                                        </select>
+                                        <label for="polished_fluorescence_color">Fluorescence Color</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_fluorescence_intensity" name="fluorescence_intensity">
+                                            <option value="">Select Intensity</option>
+                                            <option value="None">None</option>
+                                            <option value="Faint">Faint</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Strong">Strong</option>
+                                            <option value="Very Strong">Very Strong</option>
+                                        </select>
+                                        <label for="polished_fluorescence_intensity">Fluorescence Intensity</label>
+                                    </div>
+                        </div>
+                    </div>
+                    
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_shade" name="shade" type="text" placeholder="Shade">
+                                        <label for="polished_shade">Shade</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_city" name="city" type="text" placeholder="City">
+                                        <label for="polished_city">City</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_state" name="state" type="text" placeholder="State">
+                                        <label for="polished_state">State</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_country" name="country" type="text" placeholder="Country">
+                                        <label for="polished_country">Country</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_video_link" name="video_link" type="url" placeholder="Diamond Video Link">
+                                        <label for="polished_video_link">Diamond Video Link</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_video_image" name="video_image" type="url" placeholder="Diamond Video Image">
+                                        <label for="polished_video_image">Diamond Video Image</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_certificate_url" name="certificate_url" type="url" placeholder="Certificate URL">
+                                        <label for="polished_certificate_url">Certificate URL</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial Details Section -->
+                    <div class="section-divider"></div>
+                    <div class="section-title">
+                                <i class="fas fa-money-bill-wave me-2"></i>Financial Details
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_price_per_carat_inr" name="price_per_carat_inr" type="number" step="0.01" placeholder="Price Per Carat (INR)" required>
+                                        <label for="polished_price_per_carat_inr" class="required-field">Price Per Carat (₹)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_price_per_carat_usd" name="price_per_carat_usd" type="number" step="0.01" placeholder="Price Per Carat (USD)">
+                                        <label for="polished_price_per_carat_usd">Price Per Carat ($)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_exchange_rate" name="exchange_rate" type="number" step="0.01" value="87.00" placeholder="USD to INR Rate">
+                                        <label for="polished_exchange_rate">USD to INR Rate</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <button type="button" class="btn btn-outline-secondary form-control h-100" id="polished_fetch_rate_btn">
+                                            <i class="fas fa-sync-alt me-2"></i>Fetch Live Rate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Total Amount</h6>
+                                            <p class="card-text">
+                                                <span id="polished_calculation_text">Carat (0) × Price Per Carat (0)</span>
+                                            </p>
+                                            <h4 class="text-primary" id="polished_total-amount">$0.00</h4>
+                                            <h4 class="text-success" id="polished_total-amount-inr">₹0.00</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_payment_mode" name="payment_mode">
+                                            <option value="">Select Payment Mode</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Bank Transfer">Bank Transfer</option>
+                                            <option value="Check">Check</option>
+                                            <option value="Credit Card">Credit Card</option>
+                                            <option value="UPI">UPI</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <label for="polished_payment_mode">Payment Mode</label>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_transaction_id" name="transaction_id" type="text" placeholder="Transaction ID">
+                                        <label for="polished_transaction_id">Transaction ID/Reference</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="polished_payment_status" name="payment_status" required>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Partial">Partial</option>
+                                            <option value="Completed">Completed</option>
+                                </select>
+                                        <label for="polished_payment_status" class="required-field">Payment Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_payment_days" name="payment_days" type="number" placeholder="Payment Days" value="7">
+                                        <label for="polished_payment_days">Payment Terms</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_payment_due_date" name="payment_due_date" type="date">
+                                        <label for="polished_payment_due_date">Payment Due Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_payment_done_date" name="payment_done_date" type="date">
+                                        <label for="polished_payment_done_date">Payment Done Date</label>
+                            </div>
+                        </div>
+                    </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_amount_paid" name="amount_paid" type="number" step="0.01" placeholder="Amount Paid (₹)">
+                                        <label for="polished_amount_paid">Amount Paid (₹)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="polished_balance_amount" name="balance_amount" type="number" step="0.01" placeholder="Balance Amount (₹)" readonly>
+                                        <label for="polished_balance_amount">Balance Amount (₹)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notes Section -->
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-sticky-note me-2"></i>Additional Notes
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="polished_notes" name="notes" style="height: 100px"></textarea>
+                                        <label for="polished_notes">Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 mb-0">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fas fa-save me-2"></i>Record Polished Diamond Purchase
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Rough Diamond Tab -->
+                    <div class="tab-pane fade" id="rough" role="tabpanel" aria-labelledby="rough-tab">
+                        <form method="POST" action="{{ url_for('buy') }}">
+                            <input type="hidden" name="diamond_type" value="rough">
+                            
+                            <!-- Basic Information Section -->
+                            <div class="section-title">
+                                <i class="fas fa-user me-2"></i>Party Details
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_date" name="date" type="date" required value="{{ today_date }}">
+                                        <label for="rough_date" class="required-field">Date</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_party" name="party" type="text" placeholder="Party Name" required>
+                                        <label for="rough_party" class="required-field">Party</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_reference_party" name="reference_party" type="text" placeholder="Reference Party">
+                                        <label for="rough_reference_party">Reference Party</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Rough Diamond Identification Section -->
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-cubes me-2"></i>Rough Diamond Identification
+                            </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_stone_id" name="rough_id" type="text" placeholder="Rough ID" required>
+                                        <label for="rough_stone_id" class="required-field">Rough ID</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_kapan_no" name="kapan_no" type="text" placeholder="Kapan No" required>
+                                        <label for="rough_kapan_no" class="required-field">Kapan No</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_source" name="source" type="text" placeholder="Source">
+                                        <label for="rough_source">Source</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_description" name="description" type="text" placeholder="Description">
+                                        <label for="rough_description">Description</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_weight" name="weight" type="number" step="0.01" placeholder="Weight (carats)" required>
+                                        <label for="rough_weight" class="required-field">Weight (carats)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_pieces" name="pieces" type="number" placeholder="Number of Pieces" value="1">
+                                        <label for="rough_pieces">Number of Pieces</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_origin" name="origin" type="text" placeholder="Origin">
+                                        <label for="rough_origin">Origin</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_location" name="location" type="text" placeholder="Location">
+                                        <label for="rough_location">Location</label>
+                                    </div>
+                                </div>
+                    </div>
+                    
+                            <!-- Rough Diamond Characteristics Section -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_quality" name="quality">
+                                            <option value="">Select Quality</option>
+                                            <option value="Premium">Premium</option>
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                        </select>
+                                        <label for="rough_quality">Quality</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_color_category" name="color_category">
+                                            <option value="">Select Color Category</option>
+                                            <option value="White">White</option>
+                                            <option value="Yellow">Yellow</option>
+                                            <option value="Brown">Brown</option>
+                                            <option value="Pink">Pink</option>
+                                            <option value="Blue">Blue</option>
+                                            <option value="Green">Green</option>
+                                        </select>
+                                        <label for="rough_color_category">Color Category</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_clarity_category" name="clarity_category">
+                                            <option value="">Select Clarity Category</option>
+                                            <option value="Clean">Clean</option>
+                                            <option value="Slightly Included">Slightly Included</option>
+                                            <option value="Included">Included</option>
+                                            <option value="Heavily Included">Heavily Included</option>
+                                        </select>
+                                        <label for="rough_clarity_category">Clarity Category</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_shape_category" name="shape_category">
+                                            <option value="">Select Shape Category</option>
+                                            <option value="Octahedron">Octahedron</option>
+                                            <option value="Dodecahedron">Dodecahedron</option>
+                                            <option value="Cube">Cube</option>
+                                            <option value="Macle">Macle</option>
+                                            <option value="Irregular">Irregular</option>
+                                            <option value="Other">Other</option>
+                                            <option value="RegisterNew">Register New Shape</option>
+                                            <option value="DeleteShape">Delete Shape</option>
+                                        </select>
+                                        <label for="rough_shape_category">Shape Category</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="rough_custom_shape_container" style="display: none;">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_custom_shape" name="rough_custom_shape" type="text" placeholder="Custom Shape">
+                                        <label for="rough_custom_shape">Custom Shape Name</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial Details Section -->
+                    <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave me-2"></i>Financial Details
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_price_per_carat_inr" name="price_per_carat_inr" type="number" step="0.01" placeholder="Price Per Carat (INR)" required>
+                                        <label for="rough_price_per_carat_inr" class="required-field">Price Per Carat (₹)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_price_per_carat_usd" name="price_per_carat_usd" type="number" step="0.01" placeholder="Price Per Carat (USD)">
+                                        <label for="rough_price_per_carat_usd">Price Per Carat ($)</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_exchange_rate" name="exchange_rate" type="number" step="0.01" value="87.00" placeholder="USD to INR Rate">
+                                        <label for="rough_exchange_rate">USD to INR Rate</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating mb-3">
+                                        <button type="button" class="btn btn-outline-secondary form-control h-100" id="rough_fetch_rate_btn">
+                                            <i class="fas fa-sync-alt me-2"></i>Fetch Live Rate
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                            <h6 class="card-title">Total Amount</h6>
+                                            <p class="card-text">
+                                                <span id="rough_calculation_text">Weight (0) × Price Per Carat (0)</span>
+                                            </p>
+                                            <h4 class="text-primary" id="rough_total-amount">$0.00</h4>
+                                            <h4 class="text-success" id="rough_total-amount-inr">₹0.00</h4>
+                                </div>
+                            </div>
+                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_payment_mode" name="payment_mode">
+                                            <option value="">Select Payment Mode</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Bank Transfer">Bank Transfer</option>
+                                            <option value="Check">Check</option>
+                                            <option value="Credit Card">Credit Card</option>
+                                            <option value="UPI">UPI</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <label for="rough_payment_mode">Payment Mode</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" id="rough_payment_status" name="payment_status" required>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Completed">Completed</option>
+                                        </select>
+                                        <label for="rough_payment_status" class="required-field">Payment Status</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_payment_days" name="payment_days" type="number" placeholder="Payment Days" value="7">
+                                        <label for="rough_payment_days">Payment Terms</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_payment_due_date" name="payment_due_date" type="date">
+                                        <label for="rough_payment_due_date">Payment Due Date</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="rough_payment_done_date" name="payment_done_date" type="date">
+                                        <label for="rough_payment_done_date">Payment Done Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Notes Section -->
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-sticky-note me-2"></i>Additional Notes
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" id="rough_notes" name="notes" style="height: 100px"></textarea>
+                                        <label for="rough_notes">Notes</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 mb-0">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fas fa-save me-2"></i>Record Rough Diamond Purchase
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded - initializing all calculations");
+        
+        // Set today's date for date fields
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Initialize both forms
+        initializePolishedForm();
+        initializeRoughForm();
+        
+        // Handle tab switching
+        const diamondTypeTabs = document.getElementById('diamondTypeTabs');
+        if (diamondTypeTabs) {
+            const tabs = diamondTypeTabs.querySelectorAll('.nav-link');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Reset forms when switching tabs
+                    if (this.id === 'polished-tab') {
+                        initializePolishedForm();
+                    } else if (this.id === 'rough-tab') {
+                        initializeRoughForm();
+                    }
+                });
+            });
+        }
+        
+        // Setup direct event listeners for real-time calculations
+        setupDirectCalculations();
+        
+        // Create add payment modal
+        createAddPaymentModal();
+        
+        // Force initial calculations
+        calculateAllValues();
+        
+        // Add a direct trigger for calculations after a short delay to ensure DOM is fully ready
+        setTimeout(() => {
+            console.log("Triggering calculations after DOM load");
+            
+            // Trigger input events on weight and price fields to force calculations
+            const polishedCaratInput = document.getElementById('polished_carat_detail');
+            const roughWeightInput = document.getElementById('rough_weight');
+            const polishedPriceInput = document.getElementById('polished_price_per_carat_inr');
+            const roughPriceInput = document.getElementById('rough_price_per_carat_inr');
+            
+            if (polishedCaratInput) {
+                const event = new Event('input', { bubbles: true });
+                polishedCaratInput.dispatchEvent(event);
+            }
+            
+            if (roughWeightInput) {
+                const event = new Event('input', { bubbles: true });
+                roughWeightInput.dispatchEvent(event);
+            }
+            
+            if (polishedPriceInput) {
+                const event = new Event('input', { bubbles: true });
+                polishedPriceInput.dispatchEvent(event);
+            }
+            
+            if (roughPriceInput) {
+                const event = new Event('input', { bubbles: true });
+                roughPriceInput.dispatchEvent(event);
+            }
+            
+            // Force direct calculation
+            calculateTotal('polished');
+            calculateTotal('rough');
+        }, 500);
+        
+        // Check for diamond ID in flash messages
+        setTimeout(checkForDiamondId, 1000);
+    });
+
+    // Function to set up direct event listeners for real-time calculations
+    function setupDirectCalculations() {
+        console.log("Setting up direct calculation event listeners");
+        
+        // Polished diamond form
+        const polishedCaratInput = document.getElementById('polished_carat_detail');
+        const polishedPricePerCaratInrInput = document.getElementById('polished_price_per_carat_inr');
+        const polishedPricePerCaratUsdInput = document.getElementById('polished_price_per_carat_usd');
+        const polishedExchangeRateInput = document.getElementById('polished_exchange_rate');
+        
+        // Rough diamond form
+        const roughWeightInput = document.getElementById('rough_weight');
+        const roughPricePerCaratInrInput = document.getElementById('rough_price_per_carat_inr');
+        const roughPricePerCaratUsdInput = document.getElementById('rough_price_per_carat_usd');
+        const roughExchangeRateInput = document.getElementById('rough_exchange_rate');
+        
+        // Add event listeners for polished diamond form
+        if (polishedCaratInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                polishedCaratInput.addEventListener(eventType, () => calculateTotal('polished'));
+            });
+        }
+        
+        if (polishedPricePerCaratInrInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                polishedPricePerCaratInrInput.addEventListener(eventType, () => calculateTotal('polished'));
+            });
+        }
+        
+        if (polishedPricePerCaratUsdInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                polishedPricePerCaratUsdInput.addEventListener(eventType, () => calculateTotal('polished'));
+            });
+        }
+        
+        if (polishedExchangeRateInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                polishedExchangeRateInput.addEventListener(eventType, () => calculateTotal('polished'));
+            });
+        }
+        
+        // Add event listeners for rough diamond form
+        if (roughWeightInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                roughWeightInput.addEventListener(eventType, () => calculateTotal('rough'));
+            });
+        }
+        
+        if (roughPricePerCaratInrInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                roughPricePerCaratInrInput.addEventListener(eventType, () => calculateTotal('rough'));
+            });
+        }
+        
+        if (roughPricePerCaratUsdInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                roughPricePerCaratUsdInput.addEventListener(eventType, () => calculateTotal('rough'));
+            });
+        }
+        
+        if (roughExchangeRateInput) {
+            ['input', 'change', 'blur'].forEach(eventType => {
+                roughExchangeRateInput.addEventListener(eventType, () => calculateTotal('rough'));
+            });
+        }
+    }
+
+    // Function to set up calculations for a specific form
+    function setupFormCalculations(formType) {
+        const weightField = formType === 'polished' ? 'carat_detail' : 'weight';
+        
+        // Get all relevant elements
+        const weightInput = document.getElementById(`${formType}_${weightField}`);
+        const pricePerCaratINR = document.getElementById(`${formType}_price_per_carat_inr`);
+        const pricePerCaratUSD = document.getElementById(`${formType}_price_per_carat_usd`);
+        const exchangeRate = document.getElementById(`${formType}_exchange_rate`);
+        const dateInput = document.getElementById(`${formType}_date`);
+        const paymentDaysInput = document.getElementById(`${formType}_payment_days`);
+        const fetchRateBtn = document.getElementById(`${formType}_fetch_rate_btn`);
+        const paymentStatusSelect = document.getElementById(`${formType}_payment_status`);
+        const paymentDoneDateInput = document.getElementById(`${formType}_payment_done_date`);
+        const amountPaidInput = document.getElementById(`${formType}_amount_paid`);
+        const balanceAmountInput = document.getElementById(`${formType}_balance_amount`);
+        
+        // Add event listeners for total amount calculation
+        if (weightInput) {
+            // Use both input and change events for better responsiveness
+            ['input', 'change', 'blur'].forEach(eventType => {
+                weightInput.addEventListener(eventType, function() {
+                    console.log(`Weight ${eventType} event triggered with value: ${this.value}`);
+                    calculateTotal(formType);
+                });
+            });
+        }
+        
+        if (pricePerCaratINR) {
+            // Use both input and change events for better responsiveness
+            ['input', 'change', 'blur'].forEach(eventType => {
+                pricePerCaratINR.addEventListener(eventType, function() {
+                    console.log(`Price per carat INR ${eventType} event triggered with value: ${this.value}`);
+                    // Convert INR to USD
+                    if (this.value && exchangeRate && exchangeRate.value) {
+                        const usdPrice = parseFloat(this.value) / parseFloat(exchangeRate.value);
+                        if (pricePerCaratUSD) pricePerCaratUSD.value = usdPrice.toFixed(2);
+                    }
+                    calculateTotal(formType);
+                });
+            });
+        }
+        
+        if (pricePerCaratUSD) {
+            // Use both input and change events for better responsiveness
+            ['input', 'change', 'blur'].forEach(eventType => {
+                pricePerCaratUSD.addEventListener(eventType, function() {
+                    console.log(`Price per carat USD ${eventType} event triggered with value: ${this.value}`);
+                    // Convert USD to INR
+                    if (this.value && exchangeRate && exchangeRate.value) {
+                        const inrPrice = parseFloat(this.value) * parseFloat(exchangeRate.value);
+                        if (pricePerCaratINR) pricePerCaratINR.value = inrPrice.toFixed(2);
+                    }
+                    calculateTotal(formType);
+                });
+            });
+        }
+        
+        if (exchangeRate) {
+            // Use both input and change events for better responsiveness
+            ['input', 'change', 'blur'].forEach(eventType => {
+                exchangeRate.addEventListener(eventType, function() {
+                    console.log(`Exchange rate ${eventType} event triggered with value: ${this.value}`);
+                    // Update INR price based on USD price
+                    if (this.value && pricePerCaratUSD && pricePerCaratUSD.value) {
+                        const inrPrice = parseFloat(pricePerCaratUSD.value) * parseFloat(this.value);
+                        if (pricePerCaratINR) pricePerCaratINR.value = inrPrice.toFixed(2);
+                    }
+                    calculateTotal(formType);
+                });
+            });
+        }
+        
+        // Add event listeners for payment due date calculation
+        if (dateInput) {
+            dateInput.addEventListener('change', function() {
+                calculateDueDate(formType);
+            });
+        }
+        
+        if (paymentDaysInput) {
+            paymentDaysInput.addEventListener('input', function() {
+                calculateDueDate(formType);
+                updatePaymentTermsLabel(this);
+            });
+        }
+        
+        // Add event listener for payment status changes
+        if (paymentStatusSelect) {
+            paymentStatusSelect.addEventListener('change', function() {
+                handlePaymentStatusChange(formType, this.value);
+            });
+        }
+        
+        // Add event listener for amount paid changes
+        if (amountPaidInput) {
+            amountPaidInput.addEventListener('input', function() {
+                calculateBalanceAmount(formType);
+            });
+        }
+        
+        // Add event listener for fetch rate button
+        if (fetchRateBtn) {
+            fetchRateBtn.addEventListener('click', function() {
+                fetchLiveRate(formType);
+            });
+        }
+    }
+
+    // Function to calculate all values for both forms
+    function calculateAllValues() {
+        console.log("Calculating all values for both forms");
+        
+        // Calculate totals
+        calculateTotal('polished');
+        calculateTotal('rough');
+        
+        // Calculate due dates
+        calculateDueDate('polished');
+        calculateDueDate('rough');
+        
+        // Update payment terms labels
+        const polishedPaymentDays = document.getElementById('polished_payment_days');
+        const roughPaymentDays = document.getElementById('rough_payment_days');
+        
+        if (polishedPaymentDays) updatePaymentTermsLabel(polishedPaymentDays);
+        if (roughPaymentDays) updatePaymentTermsLabel(roughPaymentDays);
+    }
+
+    // Function to calculate total amount
+    function calculateTotal(formType) {
+        console.log(`Calculating total for ${formType} diamond`);
+        
+        const weightField = formType === 'polished' ? 'carat_detail' : 'weight';
+        const weightInput = document.getElementById(`${formType}_${weightField}`);
+        const pricePerCaratINR = document.getElementById(`${formType}_price_per_carat_inr`);
+        const pricePerCaratUSD = document.getElementById(`${formType}_price_per_carat_usd`);
+        const exchangeRate = document.getElementById(`${formType}_exchange_rate`);
+        const totalAmountDisplay = document.getElementById(`${formType}_total-amount`);
+        const totalAmountINRDisplay = document.getElementById(`${formType}_total-amount-inr`);
+        const calculationText = document.getElementById(`${formType}_calculation_text`);
+        
+        if (weightInput && pricePerCaratINR) {
+            // Ensure we're getting proper numeric values
+            let weight = 0;
+            if (weightInput.value && weightInput.value.trim() !== '') {
+                weight = parseFloat(weightInput.value);
+                if (isNaN(weight)) weight = 0;
+            }
+            console.log(`Weight value: ${weight} (from input: ${weightInput.value})`);
+            
+            let pricePerCaratInr = 0;
+            if (pricePerCaratINR.value && pricePerCaratINR.value.trim() !== '') {
+                pricePerCaratInr = parseFloat(pricePerCaratINR.value);
+                if (isNaN(pricePerCaratInr)) pricePerCaratInr = 0;
+            }
+            console.log(`Price per carat INR value: ${pricePerCaratInr} (from input: ${pricePerCaratINR.value})`);
+            
+            let pricePerCaratUsd = 0;
+            if (pricePerCaratUSD && pricePerCaratUSD.value && pricePerCaratUSD.value.trim() !== '') {
+                pricePerCaratUsd = parseFloat(pricePerCaratUSD.value);
+                if (isNaN(pricePerCaratUsd)) pricePerCaratUsd = 0;
+            } else if (exchangeRate && exchangeRate.value && exchangeRate.value.trim() !== '') {
+                const rate = parseFloat(exchangeRate.value);
+                if (!isNaN(rate) && rate > 0) {
+                    pricePerCaratUsd = pricePerCaratInr / rate;
+                    if (pricePerCaratUSD) pricePerCaratUSD.value = pricePerCaratUsd.toFixed(2);
+                }
+            }
+            console.log(`Price per carat USD value: ${pricePerCaratUsd}`);
+            
+            // Calculate totals
+            const totalUSD = weight * pricePerCaratUsd;
+            const totalINR = weight * pricePerCaratInr;
+            
+            console.log(`Calculated totals - USD: ${totalUSD}, INR: ${totalINR}`);
+            
+            // Update display
+            if (totalAmountDisplay) {
+                totalAmountDisplay.textContent = `$${totalUSD.toFixed(2)}`;
+            }
+            
+            if (totalAmountINRDisplay) {
+                totalAmountINRDisplay.textContent = `₹${totalINR.toFixed(2)}`;
+            }
+            
+            if (calculationText) {
+                const weightLabel = formType === 'polished' ? 'Carat' : 'Weight';
+                calculationText.textContent = `${weightLabel} (${weight}) × Price Per Carat (₹${pricePerCaratInr.toFixed(2)})`;
+            }
+            
+            console.log(`${formType} total calculated: $${totalUSD.toFixed(2)} / ₹${totalINR.toFixed(2)}`);
+            
+            // If payment status is completed, update the amount paid
+            const paymentStatusSelect = document.getElementById(`${formType}_payment_status`);
+            if (paymentStatusSelect && paymentStatusSelect.value === 'Completed') {
+                const amountPaidInput = document.getElementById(`${formType}_amount_paid`);
+                if (amountPaidInput) {
+                    amountPaidInput.value = totalINR.toFixed(2);
+                }
+            }
+            
+            // Recalculate balance
+            calculateBalanceAmount(formType);
+        }
+    }
+
+    // Function to calculate payment due date
+    function calculateDueDate(formType) {
+        console.log(`Calculating due date for ${formType} diamond`);
+        
+        const dateInput = document.getElementById(`${formType}_date`);
+        const paymentDaysInput = document.getElementById(`${formType}_payment_days`);
+        const dueDateInput = document.getElementById(`${formType}_payment_due_date`);
+        
+        if (dateInput && paymentDaysInput && dueDateInput) {
+            const purchaseDate = dateInput.value;
+            const paymentDays = parseInt(paymentDaysInput.value || 0);
+            
+            if (purchaseDate) {
+                const date = new Date(purchaseDate);
+                date.setDate(date.getDate() + paymentDays);
+                const dueDate = date.toISOString().split('T')[0];
+                dueDateInput.value = dueDate;
+                
+                console.log(`${formType} due date calculated: ${dueDate} (${paymentDays} days from ${purchaseDate})`);
+            }
+        }
+    }
+
+    // Function to update payment terms label with days suffix
+    function updatePaymentTermsLabel(input) {
+        const value = input.value.trim();
+        if (value && !isNaN(value)) {
+            // Only show the suffix visually, don't modify the actual value
+            const label = input.nextElementSibling;
+            if (label && label.tagName === 'LABEL') {
+                label.textContent = `Payment Terms (${value} days)`;
+            }
+        } else {
+            // Reset the label if not a number
+            const label = input.nextElementSibling;
+            if (label && label.tagName === 'LABEL') {
+                label.textContent = 'Payment Terms';
+            }
+        }
+    }
+
+    // Function to fetch live exchange rate
+    function fetchLiveRate(formType) {
+        console.log(`Fetching live rate for ${formType} diamond`);
+        
+        const exchangeRate = document.getElementById(`${formType}_exchange_rate`);
+        
+        // Show loading state
+        const fetchRateBtn = document.getElementById(`${formType}_fetch_rate_btn`);
+        if (fetchRateBtn) {
+            fetchRateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Fetching...';
+            fetchRateBtn.disabled = true;
+        }
+        
+        // Simulate API call (in a real app, you would call an actual exchange rate API)
+        setTimeout(() => {
+            // Example rate - in a real app, this would come from an API
+            const liveRate = 87.25; // Example USD to INR rate
+            
+            // Update exchange rate field
+            if (exchangeRate) {
+                exchangeRate.value = liveRate.toFixed(2);
+                
+                // Trigger rate change event to update prices
+                const event = new Event('input', { bubbles: true });
+                exchangeRate.dispatchEvent(event);
+            }
+            
+            // Reset button state
+            if (fetchRateBtn) {
+                fetchRateBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Fetch Live Rate';
+                fetchRateBtn.disabled = false;
+            }
+            
+            // Show success message
+            alert('Exchange rate updated successfully!');
+        }, 1000);
+    }
+
+    // Function to handle payment status changes
+    function handlePaymentStatusChange(formType, status) {
+        console.log(`Payment status changed to ${status} for ${formType} diamond`);
+        
+        const paymentDoneDateInput = document.getElementById(`${formType}_payment_done_date`);
+        const amountPaidInput = document.getElementById(`${formType}_amount_paid`);
+        const balanceAmountInput = document.getElementById(`${formType}_balance_amount`);
+        const totalAmountINRDisplay = document.getElementById(`${formType}_total-amount-inr`);
+        const paymentHistoryContainer = document.getElementById(`${formType}_payment_history_container`);
+        const addPaymentBtn = document.getElementById(`${formType}_add_payment_btn`);
+        
+        if (status === 'Completed') {
+            // Set payment done date to today
+            const today = new Date().toISOString().split('T')[0];
+            if (paymentDoneDateInput) paymentDoneDateInput.value = today;
+            
+            // Set amount paid to total amount
+            if (amountPaidInput && totalAmountINRDisplay) {
+                const totalText = totalAmountINRDisplay.textContent;
+                const totalAmount = parseFloat(totalText.replace('₹', '').replace(',', ''));
+                amountPaidInput.value = totalAmount.toFixed(2);
+            }
+            
+            // Set balance amount to 0
+            if (balanceAmountInput) balanceAmountInput.value = '0.00';
+            
+            // Show payment history container
+            if (paymentHistoryContainer) paymentHistoryContainer.style.display = 'block';
+            
+            // Add a full payment entry if no payments exist yet
+            const paymentsList = document.getElementById(`${formType}_payments_list`);
+            if (paymentsList && paymentsList.children.length === 0 && totalAmountINRDisplay) {
+                const totalText = totalAmountINRDisplay.textContent;
+                const totalAmount = parseFloat(totalText.replace('₹', '').replace(',', ''));
+                
+                // Get payment mode
+                const paymentModeSelect = document.getElementById(`${formType}_payment_mode`);
+                const paymentMode = paymentModeSelect ? paymentModeSelect.value : 'Unknown';
+                
+                // Get transaction ID
+                const transactionIdInput = document.getElementById(`${formType}_transaction_id`);
+                const transactionId = transactionIdInput ? transactionIdInput.value : '';
+                
+                addPaymentEntry(formType, totalAmount.toFixed(2), today, paymentMode, transactionId, 'Full Payment');
+            }
+            
+            // Disable add payment button
+            if (addPaymentBtn) addPaymentBtn.disabled = true;
+            
+        } else if (status === 'Partial') {
+            // Enable amount paid field
+            if (amountPaidInput) {
+                amountPaidInput.disabled = false;
+            }
+            
+            // Calculate balance
+            calculateBalanceAmount(formType);
+            
+            // Show payment history container
+            if (paymentHistoryContainer) paymentHistoryContainer.style.display = 'block';
+            
+            // Enable add payment button
+            if (addPaymentBtn) addPaymentBtn.disabled = false;
+            
+        } else if (status === 'Pending') {
+            // Clear payment done date
+            if (paymentDoneDateInput) paymentDoneDateInput.value = '';
+            
+            // Set amount paid to 0
+            if (amountPaidInput) amountPaidInput.value = '0.00';
+            
+            // Calculate balance
+            calculateBalanceAmount(formType);
+            
+            // Hide payment history container
+            if (paymentHistoryContainer) paymentHistoryContainer.style.display = 'none';
+            
+            // Clear payment history
+            const paymentsList = document.getElementById(`${formType}_payments_list`);
+            if (paymentsList) paymentsList.innerHTML = '';
+            
+            // Disable add payment button
+            if (addPaymentBtn) addPaymentBtn.disabled = true;
+        }
+    }
+
+    // Function to add a payment entry to the payment history
+    function addPaymentEntry(formType, amount, date, paymentMode, transactionId, notes) {
+        const paymentsList = document.getElementById(`${formType}_payments_list`);
+        if (!paymentsList) return;
+        
+        // Create payment entry
+        const paymentEntry = document.createElement('div');
+        paymentEntry.className = 'card mb-2 payment-entry';
+        
+        // Format the payment entry
+        paymentEntry.innerHTML = `
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">₹${amount} <span class="badge ${paymentMode === 'Cash' ? 'bg-success' : 'bg-primary'}">${paymentMode}</span></h6>
+                        <small class="text-muted">${date} ${transactionId ? '• ' + transactionId : ''}</small>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-payment-btn">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                ${notes ? `<small class="text-muted d-block mt-1">${notes}</small>` : ''}
+                <input type="hidden" name="${formType}_payment_amounts[]" value="${amount}">
+                <input type="hidden" name="${formType}_payment_dates[]" value="${date}">
+                <input type="hidden" name="${formType}_payment_modes[]" value="${paymentMode}">
+                <input type="hidden" name="${formType}_payment_transaction_ids[]" value="${transactionId}">
+                <input type="hidden" name="${formType}_payment_notes[]" value="${notes}">
+            </div>
+        `;
+        
+        // Add delete button functionality
+        const deleteBtn = paymentEntry.querySelector('.delete-payment-btn');
+        deleteBtn.addEventListener('click', function() {
+            paymentsList.removeChild(paymentEntry);
+            recalculatePayments(formType);
+        });
+        
+        // Add to payment history
+        paymentsList.appendChild(paymentEntry);
+        
+        // Recalculate total paid amount and balance
+        recalculatePayments(formType);
+    }
+
+    // Function to recalculate payments total and balance
+    function recalculatePayments(formType) {
+        const paymentsList = document.getElementById(`${formType}_payments_list`);
+        const amountPaidInput = document.getElementById(`${formType}_amount_paid`);
+        
+        if (!paymentsList || !amountPaidInput) return;
+        
+        // Get all payment amounts
+        const paymentAmounts = paymentsList.querySelectorAll(`input[name="${formType}_payment_amounts[]"]`);
+        let totalPaid = 0;
+        
+        // Sum up all payments
+        paymentAmounts.forEach(input => {
+            totalPaid += parseFloat(input.value || 0);
+        });
+        
+        // Update amount paid
+        amountPaidInput.value = totalPaid.toFixed(2);
+        
+        // Update balance
+        calculateBalanceAmount(formType);
+        
+        // Update payment status if needed
+        updatePaymentStatus(formType, totalPaid);
+    }
+
+    // Function to update payment status based on total paid
+    function updatePaymentStatus(formType, totalPaid) {
+        const totalAmountINRDisplay = document.getElementById(`${formType}_total-amount-inr`);
+        const paymentStatusSelect = document.getElementById(`${formType}_payment_status`);
+        
+        if (!totalAmountINRDisplay || !paymentStatusSelect) return;
+        
+        const totalText = totalAmountINRDisplay.textContent;
+        const totalAmount = parseFloat(totalText.replace('₹', '').replace(',', ''));
+        
+        // Determine payment status
+        if (totalPaid <= 0) {
+            // Don't change if it's already set to Pending
+            if (paymentStatusSelect.value !== 'Pending') {
+                paymentStatusSelect.value = 'Pending';
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                paymentStatusSelect.dispatchEvent(event);
+            }
+        } else if (Math.abs(totalPaid - totalAmount) < 0.01) {
+            // Don't change if it's already set to Completed
+            if (paymentStatusSelect.value !== 'Completed') {
+                paymentStatusSelect.value = 'Completed';
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                paymentStatusSelect.dispatchEvent(event);
+            }
+        } else if (totalPaid > 0 && totalPaid < totalAmount) {
+            // Don't change if it's already set to Partial
+            if (paymentStatusSelect.value !== 'Partial') {
+                paymentStatusSelect.value = 'Partial';
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                paymentStatusSelect.dispatchEvent(event);
+            }
+        }
+    }
+
+    // Function to show add payment modal
+    function showAddPaymentModal(formType) {
+        // Get the balance amount
+        const balanceAmountInput = document.getElementById(`${formType}_balance_amount`);
+        const balanceAmount = balanceAmountInput ? parseFloat(balanceAmountInput.value || 0) : 0;
+        
+        // Set up the modal
+        const modalTitle = document.getElementById('addPaymentModalLabel');
+        const paymentAmountInput = document.getElementById('payment_amount');
+        const paymentDateInput = document.getElementById('payment_date');
+        const paymentModeSelect = document.getElementById('payment_mode');
+        const paymentTransactionIdInput = document.getElementById('payment_transaction_id');
+        const paymentNotesInput = document.getElementById('payment_notes');
+        const addPaymentFormBtn = document.getElementById('add_payment_form_btn');
+        
+        if (modalTitle) modalTitle.textContent = `Add Payment for ${formType === 'polished' ? 'Polished' : 'Rough'} Diamond`;
+        if (paymentAmountInput) paymentAmountInput.value = balanceAmount.toFixed(2);
+        if (paymentDateInput) paymentDateInput.value = new Date().toISOString().split('T')[0];
+        if (paymentModeSelect) {
+            // Copy the selected payment mode from the main form
+            const mainPaymentModeSelect = document.getElementById(`${formType}_payment_mode`);
+            if (mainPaymentModeSelect) paymentModeSelect.value = mainPaymentModeSelect.value;
+        }
+        if (paymentTransactionIdInput) paymentTransactionIdInput.value = '';
+        if (paymentNotesInput) paymentNotesInput.value = '';
+        
+        // Set form type as data attribute
+        const addPaymentModal = document.getElementById('addPaymentModal');
+        if (addPaymentModal) addPaymentModal.setAttribute('data-form-type', formType);
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
+        modal.show();
+    }
+
+    // Function to handle add payment form submission
+    function handleAddPaymentSubmit() {
+        const addPaymentModal = document.getElementById('addPaymentModal');
+        const formType = addPaymentModal ? addPaymentModal.getAttribute('data-form-type') : null;
+        
+        if (!formType) return;
+        
+        // Get form values
+        const paymentAmountInput = document.getElementById('payment_amount');
+        const paymentDateInput = document.getElementById('payment_date');
+        const paymentModeSelect = document.getElementById('payment_mode');
+        const paymentTransactionIdInput = document.getElementById('payment_transaction_id');
+        const paymentNotesInput = document.getElementById('payment_notes');
+        
+        const amount = paymentAmountInput ? paymentAmountInput.value : '0';
+        const date = paymentDateInput ? paymentDateInput.value : new Date().toISOString().split('T')[0];
+        const paymentMode = paymentModeSelect ? paymentModeSelect.value : '';
+        const transactionId = paymentTransactionIdInput ? paymentTransactionIdInput.value : '';
+        const notes = paymentNotesInput ? paymentNotesInput.value : '';
+        
+        // Add payment entry
+        addPaymentEntry(formType, amount, date, paymentMode, transactionId, notes);
+        
+        // Update main form payment mode and transaction ID
+        const mainPaymentModeSelect = document.getElementById(`${formType}_payment_mode`);
+        const mainTransactionIdInput = document.getElementById(`${formType}_transaction_id`);
+        
+        if (mainPaymentModeSelect && paymentMode) mainPaymentModeSelect.value = paymentMode;
+        if (mainTransactionIdInput && transactionId) mainTransactionIdInput.value = transactionId;
+        
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addPaymentModal'));
+        modal.hide();
+    }
+
+    // Function to initialize polished diamond form
+    function initializePolishedForm() {
+        console.log("Initializing polished diamond form");
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Set today's date
+        const polishedDateInput = document.getElementById('polished_date');
+        if (polishedDateInput) polishedDateInput.value = today;
+        
+        // Initialize Diamond Details section
+        const thanInput = document.getElementById('polished_than');
+        if (thanInput && !thanInput.value) thanInput.value = '1';
+        
+        // Setup color type handling
+        setupColorTypeHandling();
+        
+        // Setup shape handling
+        setupShapeHandling();
+        
+        // Setup diamond type handling
+        setupDiamondTypeHandling();
+        
+        // Initialize payment status
+        const paymentStatusSelect = document.getElementById('polished_payment_status');
+        if (paymentStatusSelect) {
+            handlePaymentStatusChange('polished', paymentStatusSelect.value);
+        }
+        
+        // Force calculations with a slight delay to ensure all fields are properly initialized
+        setTimeout(() => {
+            calculateTotal('polished');
+            calculateDueDate('polished');
+            calculateBalanceAmount('polished');
+        }, 100);
+        
+        // Update payment terms label
+        const paymentDaysInput = document.getElementById('polished_payment_days');
+        if (paymentDaysInput) {
+            updatePaymentTermsLabel(paymentDaysInput);
+        }
+        
+        // Set up payment history
+        setupPaymentHistory('polished');
+    }
+
+    // Function to initialize rough diamond form
+    function initializeRoughForm() {
+        console.log("Initializing rough diamond form");
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Set today's date
+        const roughDateInput = document.getElementById('rough_date');
+        if (roughDateInput) roughDateInput.value = today;
+        
+        // Setup rough shape handling
+        setupRoughShapeHandling();
+        
+        // Initialize payment status
+        const paymentStatusSelect = document.getElementById('rough_payment_status');
+        if (paymentStatusSelect) {
+            handlePaymentStatusChange('rough', paymentStatusSelect.value);
+        }
+        
+        // Force calculations with a slight delay to ensure all fields are properly initialized
+        setTimeout(() => {
+            calculateTotal('rough');
+            calculateDueDate('rough');
+            calculateBalanceAmount('rough');
+        }, 100);
+        
+        // Update payment terms label
+        const paymentDaysInput = document.getElementById('rough_payment_days');
+        if (paymentDaysInput) {
+            updatePaymentTermsLabel(paymentDaysInput);
+        }
+        
+        // Set up payment history
+        setupPaymentHistory('rough');
+    }
+
+    // Function to handle color type selection
+    function setupColorTypeHandling() {
+        const colorTypeSelect = document.getElementById('polished_color_type');
+        const whiteColorContainer = document.getElementById('polished_white_color_container');
+        const fancyColorContainer = document.getElementById('polished_fancy_color_container');
+        const fancyIntensityContainer = document.getElementById('polished_fancy_intensity_container');
+        const customFancyColorContainer = document.getElementById('polished_custom_fancy_color_container');
+        
+        if (colorTypeSelect && whiteColorContainer && fancyColorContainer) {
+            // Initial setup based on current selection
+            if (colorTypeSelect.value === 'White') {
+                whiteColorContainer.style.display = 'block';
+                fancyColorContainer.style.display = 'none';
+                fancyIntensityContainer.style.display = 'none';
+                customFancyColorContainer.style.display = 'none';
+            } else if (colorTypeSelect.value === 'Fancy') {
+                whiteColorContainer.style.display = 'none';
+                fancyColorContainer.style.display = 'block';
+                fancyIntensityContainer.style.display = 'block';
+                
+                // Check if fancy color is "Other" and show custom field if needed
+                setupFancyColorHandling();
+            }
+            
+            // Add event listener for color type changes
+            colorTypeSelect.addEventListener('change', function() {
+                if (this.value === 'White') {
+                    whiteColorContainer.style.display = 'block';
+                    fancyColorContainer.style.display = 'none';
+                    fancyIntensityContainer.style.display = 'none';
+                    customFancyColorContainer.style.display = 'none';
+                } else if (this.value === 'Fancy') {
+                    whiteColorContainer.style.display = 'none';
+                    fancyColorContainer.style.display = 'block';
+                    fancyIntensityContainer.style.display = 'block';
+                    
+                    // Setup fancy color handling when switching to Fancy
+                    setupFancyColorHandling();
+                }
+            });
+        }
+    }
+    
+    // Function to handle fancy color selection
+    function setupFancyColorHandling() {
+        const fancyColorSelect = document.getElementById('polished_fancy_color');
+        const customFancyColorContainer = document.getElementById('polished_custom_fancy_color_container');
+        
+        if (fancyColorSelect && customFancyColorContainer) {
+            // Initial setup based on current selection
+            if (fancyColorSelect.value === 'Other') {
+                customFancyColorContainer.style.display = 'block';
+            } else {
+                customFancyColorContainer.style.display = 'none';
+            }
+            
+            // Add event listener for fancy color changes
+            fancyColorSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    customFancyColorContainer.style.display = 'block';
+                } else {
+                    customFancyColorContainer.style.display = 'none';
+                    // Clear custom fancy color when not "Other"
+                    document.getElementById('polished_custom_fancy_color').value = '';
+                }
+            });
+        }
+    }
+    
+    // Function to handle shape selection
+    function setupShapeHandling() {
+        const shapeSelect = document.getElementById('polished_shape_select');
+        const customShapeInput = document.getElementById('polished_custom_shape');
+        const customShapeContainer = customShapeInput ? customShapeInput.parentElement.parentElement : null;
+        
+        if (shapeSelect && customShapeContainer) {
+            // Initial setup based on current selection
+            if (shapeSelect.value === 'Other') {
+                customShapeContainer.style.display = 'block';
+            } else {
+                customShapeContainer.style.display = 'none';
+            }
+            
+            // Add event listener for shape changes
+            shapeSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    customShapeContainer.style.display = 'block';
+                } else {
+                    customShapeContainer.style.display = 'none';
+                    // Clear custom shape when not "Other"
+                    if (customShapeInput) customShapeInput.value = '';
+                }
+            });
+        }
+    }
+    
+    // Function to handle rough shape selection
+    function setupRoughShapeHandling() {
+        const shapeSelect = document.getElementById('rough_shape_category');
+        const customShapeInput = document.getElementById('rough_custom_shape');
+        const customShapeContainer = document.getElementById('rough_custom_shape_container');
+        
+        if (shapeSelect && customShapeContainer) {
+            // Initial setup based on current selection
+            if (shapeSelect.value === 'Other') {
+                customShapeContainer.style.display = 'block';
+            } else {
+                customShapeContainer.style.display = 'none';
+            }
+            
+            // Add event listener for shape changes
+            shapeSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    customShapeContainer.style.display = 'block';
+                } else {
+                    customShapeContainer.style.display = 'none';
+                    // Clear custom shape when not "Other"
+                    if (customShapeInput) customShapeInput.value = '';
+                }
+            });
+        }
+    }
+
+    // Function to handle diamond type selection
+    function setupDiamondTypeHandling() {
+        const diamondTypeSelect = document.getElementById('polished_diamond_type');
+        const growthTypeContainer = document.getElementById('polished_growth_type_container');
+        
+        if (diamondTypeSelect && growthTypeContainer) {
+            // Initial setup based on current selection
+            if (diamondTypeSelect.value === 'Lab Grown') {
+                growthTypeContainer.style.display = 'block';
+            } else {
+                growthTypeContainer.style.display = 'none';
+            }
+            
+            // Add event listener for diamond type changes
+            diamondTypeSelect.addEventListener('change', function() {
+                if (this.value === 'Lab Grown') {
+                    growthTypeContainer.style.display = 'block';
+                } else {
+                    growthTypeContainer.style.display = 'none';
+                    // Clear growth type value when not lab grown
+                    document.getElementById('polished_growth_type').value = '';
+                }
+            });
+        }
+    }
+
+    // Function to set up payment history
+    function setupPaymentHistory(formType) {
+        // Check if payment history container exists
+        const paymentHistoryContainer = document.getElementById(`${formType}_payment_history_container`);
+        if (!paymentHistoryContainer) {
+            // Create payment history container
+            const financialDetailsSection = document.querySelector(`#${formType} [class*="section-title"]:has(i[class*="fa-money-bill-wave"])`);
+            
+            if (!financialDetailsSection) {
+                // Try alternative selector
+                const allSectionTitles = document.querySelectorAll(`#${formType} .section-title`);
+                for (let i = 0; i < allSectionTitles.length; i++) {
+                    if (allSectionTitles[i].textContent.includes('Financial Details')) {
+                        financialDetailsSection = allSectionTitles[i];
+                        break;
+                    }
+                }
+            }
+            
+            if (financialDetailsSection) {
+                // Find the parent section
+                const sectionContainer = financialDetailsSection.closest('.section-divider')?.nextElementSibling || 
+                                        financialDetailsSection.parentElement.nextElementSibling;
+                
+                // Create payment history container after the financial details section
+                const container = document.createElement('div');
+                container.id = `${formType}_payment_history_container`;
+                container.className = 'mt-4';
+                container.style.display = 'none'; // Hidden by default
+                
+                container.innerHTML = `
+                    <h6 class="mb-3"><i class="fas fa-history me-2"></i>Payment History</h6>
+                    <div id="${formType}_payments_list" class="mb-3">
+                        <!-- Payment entries will be added here -->
+                    </div>
+                    <button type="button" id="${formType}_add_payment_btn" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>Add Payment
+                    </button>
+                `;
+                
+                // Insert after financial details section
+                if (sectionContainer) {
+                    sectionContainer.parentNode.insertBefore(container, sectionContainer.nextSibling);
+                } else {
+                    // Fallback - insert at the end of the form
+                    const form = document.querySelector(`#${formType} form`);
+                    if (form) {
+                        const submitButton = form.querySelector('button[type="submit"]').closest('.mt-4');
+                        if (submitButton) {
+                            form.insertBefore(container, submitButton);
+                        } else {
+                            form.appendChild(container);
+                        }
+                    }
+                }
+                
+                // Add event listener for add payment button
+                const addPaymentBtn = document.getElementById(`${formType}_add_payment_btn`);
+                if (addPaymentBtn) {
+                    addPaymentBtn.addEventListener('click', function() {
+                        showAddPaymentModal(formType);
+                    });
+                }
+            }
+        }
+    }
+
+    // Function to create add payment modal
+    function createAddPaymentModal() {
+        // Check if modal already exists
+        if (document.getElementById('addPaymentModal')) {
+            return;
+        }
+        
+        // Create modal container
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'modal fade';
+        modalContainer.id = 'addPaymentModal';
+        modalContainer.tabIndex = '-1';
+        modalContainer.setAttribute('aria-labelledby', 'addPaymentModalLabel');
+        modalContainer.setAttribute('aria-hidden', 'true');
+        
+        // Create modal HTML
+        modalContainer.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPaymentModalLabel">Add Payment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addPaymentForm">
+                            <div class="mb-3">
+                                <label for="payment_amount" class="form-label">Amount (₹)</label>
+                                <input type="number" class="form-control" id="payment_amount" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment_date" class="form-label">Payment Date</label>
+                                <input type="date" class="form-control" id="payment_date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment_mode" class="form-label">Payment Mode</label>
+                                <select class="form-control" id="payment_mode" required>
+                                    <option value="">Select Payment Mode</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Check">Check</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment_transaction_id" class="form-label">Transaction ID/Reference</label>
+                                <input type="text" class="form-control" id="payment_transaction_id">
+                            </div>
+                            <div class="mb-3">
+                                <label for="payment_notes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="payment_notes" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="add_payment_form_btn">Add Payment</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Append modal to body
+        document.body.appendChild(modalContainer);
+        
+        // Add event listener to add payment button
+        document.getElementById('add_payment_form_btn').addEventListener('click', handleAddPaymentSubmit);
+    }
+
+    // Function to calculate balance amount
+    function calculateBalanceAmount(formType) {
+        console.log(`Calculating balance amount for ${formType} diamond`);
+        
+        const amountPaidInput = document.getElementById(`${formType}_amount_paid`);
+        const balanceAmountInput = document.getElementById(`${formType}_balance_amount`);
+        const totalAmountINRDisplay = document.getElementById(`${formType}_total-amount-inr`);
+        
+        if (amountPaidInput && balanceAmountInput && totalAmountINRDisplay) {
+            const totalText = totalAmountINRDisplay.textContent;
+            const totalAmount = parseFloat(totalText.replace('₹', '').replace(',', ''));
+            const amountPaid = parseFloat(amountPaidInput.value || 0);
+            
+            const balanceAmount = totalAmount - amountPaid;
+            balanceAmountInput.value = balanceAmount.toFixed(2);
+            
+            console.log(`Balance calculated: ₹${balanceAmount.toFixed(2)} (Total: ₹${totalAmount.toFixed(2)} - Paid: ₹${amountPaid.toFixed(2)})`);
+        }
+    }
+
+    // Function to check for diamond ID in flash message and show success modal
+    function checkForDiamondId() {
+        const flashMessages = document.querySelectorAll('.alert-success');
+        
+        flashMessages.forEach(message => {
+            const text = message.textContent.trim();
+            const match = text.match(/Added to inventory with ID: (D\d+)/);
+            
+            if (match && match[1]) {
+                const diamondId = match[1];
+                showDiamondAddedModal(diamondId);
+            }
+        });
+    }
+
+    // Function to show diamond added success modal
+    function showDiamondAddedModal(diamondId) {
+        // Create modal if it doesn't exist
+        if (!document.getElementById('diamondAddedModal')) {
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal fade';
+            modalContainer.id = 'diamondAddedModal';
+            modalContainer.tabIndex = '-1';
+            modalContainer.setAttribute('aria-labelledby', 'diamondAddedModalLabel');
+            modalContainer.setAttribute('aria-hidden', 'true');
+            
+            modalContainer.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="diamondAddedModalLabel">
+                                <i class="fas fa-check-circle me-2"></i>Diamond Added Successfully
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-3">The polished diamond has been successfully added to inventory.</p>
+                            <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                                <div class="me-3">
+                                    <i class="fas fa-gem fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Diamond ID</h6>
+                                    <h4 class="mb-0 text-primary" id="modalDiamondId"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a href="/inventory" class="btn btn-primary">
+                                <i class="fas fa-list me-2"></i>View Inventory
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalContainer);
+        }
+        
+        // Set diamond ID in modal
+        const modalDiamondId = document.getElementById('modalDiamondId');
+        if (modalDiamondId) {
+            modalDiamondId.textContent = diamondId;
+        }
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('diamondAddedModal'));
+        modal.show();
+    }
+
+    // Check for diamond ID in flash messages when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Existing code...
+        
+        // Check for diamond ID in flash messages
+        setTimeout(checkForDiamondId, 500);
+    });
+</script>
+{% endblock %} 

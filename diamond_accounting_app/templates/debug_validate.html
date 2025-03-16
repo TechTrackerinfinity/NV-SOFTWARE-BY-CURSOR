@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Data Validation - Debug - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Data Validation Debug Tool{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Debug</li>
+<li class="breadcrumb-item active">Data Validation</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Debug Mode:</strong> This tool is only available in debug mode and should not be accessible in production.
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Validation Summary</h6>
+                    <div>
+                        <a href="{{ url_for('debug_validate_data') }}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </a>
+                        <a href="{{ url_for('debug_validate_data', fix='true') }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-wrench me-1"></i>Fix Issues
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p><strong>Timestamp:</strong> {{ results.timestamp }}</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Data Files</h6>
+                                    <p class="card-text">
+                                        {% set total_files = results.files|length %}
+                                        {% set existing_files = results.files.values()|selectattr('exists', 'equalto', true)|list|length %}
+                                        <span class="badge {% if existing_files == total_files %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ existing_files }}/{{ total_files }} files exist
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Data Consistency</h6>
+                                    <p class="card-text">
+                                        {% if results.consistency.has_issues is defined %}
+                                            <span class="badge {% if not results.consistency.has_issues %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if not results.consistency.has_issues %}
+                                                    No issues found
+                                                {% else %}
+                                                    {{ results.consistency.issues|length }} issues found
+                                                {% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Validation error</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Backups</h6>
+                                    <p class="card-text">
+                                        <span class="badge {% if results.backups.count > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ results.backups.count }} backups available
+                                        </span>
+                                        {% if results.backups.latest %}
+                                            <br>
+                                            <small>Latest: {{ results.backups.latest_time }}</small>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if request.args.get('fix') == 'true' %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Fixed {{ results.fixed_issues }} issues.
+                            {% if results.consistency.all_fixed %}
+                                <strong>All issues have been resolved.</strong>
+                            {% elif results.consistency.remaining_issues|length > 0 %}
+                                <strong>{{ results.consistency.remaining_issues|length }} issues remain.</strong>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h6>Data Files</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">File</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Size</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Last Modified</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Rows</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Columns</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for name, info in results.files.items() %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex px-2 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm">{{ name }}.xlsx</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if info.exists %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if info.exists %}Exists{% else %}Missing{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if info.exists %}
+                                                <p class="text-xs font-weight-bold mb-0">{{ info.size|format_size }}</p>
+                                            {% else %}
+                                                <p class="text-xs text-muted mb-0">N/A</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if info.exists %}
+                                                <p class="text-xs font-weight-bold mb-0">{{ info.last_modified }}</p>
+                                            {% else %}
+                                                <p class="text-xs text-muted mb-0">N/A</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if info.exists and 'error' not in info %}
+                                                <p class="text-xs font-weight-bold mb-0">{{ info.rows }}</p>
+                                            {% elif 'error' in info %}
+                                                <p class="text-xs text-danger mb-0">Error</p>
+                                            {% else %}
+                                                <p class="text-xs text-muted mb-0">N/A</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if info.exists and 'error' not in info %}
+                                                <p class="text-xs font-weight-bold mb-0">{{ info.columns|length }}</p>
+                                                <button class="btn btn-sm btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#columns-{{ name }}" aria-expanded="false">
+                                                    Show columns
+                                                </button>
+                                                <div class="collapse" id="columns-{{ name }}">
+                                                    <div class="mt-2">
+                                                        <ul class="list-group list-group-flush">
+                                                            {% for column in info.columns %}
+                                                                <li class="list-group-item py-1 px-2">{{ column }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            {% elif 'error' in info %}
+                                                <p class="text-xs text-danger mb-0">{{ info.error }}</p>
+                                            {% else %}
+                                                <p class="text-xs text-muted mb-0">N/A</p>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h6>Data Consistency Issues</h6>
+                </div>
+                <div class="card-body">
+                    {% if results.consistency.error is defined %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Error checking data consistency: {{ results.consistency.error }}
+                        </div>
+                    {% elif results.consistency.issues is defined and results.consistency.issues|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Issue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for issue in results.consistency.issues %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <p class="text-sm mb-0">{{ issue }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            No data consistency issues found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h6>Available Backups</h6>
+                </div>
+                <div class="card-body">
+                    {% if results.backups.count > 0 %}
+                        <p>{{ results.backups.count }} backup(s) available.</p>
+                        <p>Latest backup: {{ results.backups.latest }} ({{ results.backups.latest_time }})</p>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No backups found. It is recommended to create a backup before making any changes.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{{ url_for('backup') }}" class="btn btn-primary">
+                            <i class="fas fa-database me-2"></i>Go to Backup & Restore
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof DEBUG !== 'undefined') {
+            DEBUG.info('Debug validation page loaded');
+        }
+    });
+</script>
+{% endblock %} 

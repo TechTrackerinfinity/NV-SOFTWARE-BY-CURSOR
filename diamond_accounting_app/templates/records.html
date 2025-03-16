@@ -1,0 +1,732 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction Records - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Transaction Records{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Records</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .nav-tabs .nav-link {
+        color: #495057;
+    }
+    .nav-tabs .nav-link.active {
+        color: #007bff;
+        font-weight: 500;
+    }
+    .table-responsive {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    .export-btn {
+        margin-bottom: 15px;
+        margin-right: 10px;
+    }
+    .export-btn i {
+        margin-right: 5px;
+    }
+    .export-btn-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    /* Additional styles for the sales table */
+    .table th, .table td {
+        white-space: nowrap;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .table-sales {
+        min-width: 1800px;
+    }
+    .badge {
+        font-size: 0.8rem;
+    }
+    .filter-controls {
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    .filter-controls .form-control {
+        font-size: 0.9rem;
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+    }
+    .filter-controls .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    .empty-cell {
+        color: #aaa;
+        font-style: italic;
+    }
+    /* New status button styles */
+    .status-badge {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .status-badge:hover {
+        opacity: 0.8;
+    }
+    /* Payment status badges */
+    .payment-status {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .payment-status:hover {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+    
+    /* Tooltip styling */
+    .tooltip {
+        position: absolute;
+        z-index: 1070;
+        display: block;
+        margin: 0;
+        font-family: var(--bs-font-sans-serif);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5;
+        text-align: left;
+        text-decoration: none;
+        text-shadow: none;
+        text-transform: none;
+        letter-spacing: normal;
+        word-break: normal;
+        word-spacing: normal;
+        white-space: normal;
+        line-break: auto;
+        font-size: 0.875rem;
+        word-wrap: break-word;
+        opacity: 0;
+    }
+    
+    .tooltip.show {
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% macro format_indian(number) %}
+    {% if number is none or number == 'nan' or number == '' %}
+        0.00
+    {% else %}
+        {% set num_str = '{:.2f}'.format(number|float) %}
+        {% set parts = num_str.split('.') %}
+        {% set int_part = parts[0]|string %}
+        {% set formatted = '' %}
+        
+        {% if int_part|length <= 3 %}
+            {% set formatted = int_part %}
+        {% else %}
+            {% set first_part = int_part[:-3] %}
+            {% set last_part = int_part[-3:] %}
+            
+            {% set remaining = first_part %}
+            {% set formatted = last_part %}
+            
+            {% for i in range(0, remaining|length, 2) %}
+                {% if i + 2 <= remaining|length %}
+                    {% set formatted = remaining[remaining|length - i - 2:remaining|length - i] + ',' + formatted %}
+                {% else %}
+                    {% set formatted = remaining[0:remaining|length - i] + ',' + formatted %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        
+        {% if parts|length > 1 %}
+            {% set formatted = formatted + '.' + parts[1] %}
+        {% endif %}
+        
+        {{ formatted }}
+    {% endif %}
+{% endmacro %}
+
+{% macro safe_float(value, default=0) %}
+    {% if value is none or value == 'nan' or value == '' %}
+        {{ default }}
+    {% else %}
+        {{ value|float|default(default)|round(2) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro safe_display(value, default='—') %}
+    {% if value is none or value == 'nan' or value == '' or value == 'N/A' %}
+        <span class="empty-cell">{{ default }}</span>
+    {% else %}
+        {{ value }}
+    {% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Transaction Records</h6>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm btn-outline-primary active" id="all-tab">All</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="purchases-tab">Purchases</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="sales-tab">Sales</button>
+    </div>
+                    </div>
+                <div class="card-body">
+                    <!-- Advanced Filtering Controls -->
+                    <div class="filter-controls">
+                    <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="date-range" class="form-label">Date Range</label>
+                                    <select class="form-select form-select-sm" id="date-range">
+                                        <option value="all">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">This Week</option>
+                                        <option value="month" selected>This Month</option>
+                                        <option value="quarter">This Quarter</option>
+                                        <option value="year">This Year</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="payment-status" class="form-label">Payment Status</label>
+                                    <select class="form-select form-select-sm" id="payment-status">
+                                        <option value="all">All Statuses</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                                </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="party-filter" class="form-label">Party</label>
+                                    <input type="text" class="form-control form-control-sm" id="party-filter" placeholder="Search by party name">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="amount-range" class="form-label">Amount Range</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control form-control-sm" id="min-amount" placeholder="Min">
+                                        <span class="input-group-text">to</span>
+                                        <input type="number" class="form-control form-control-sm" id="max-amount" placeholder="Max">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-sm btn-primary" id="apply-filters">
+                                    <i class="fas fa-filter me-1"></i> Apply Filters
+                                </button>
+                                <button class="btn btn-sm btn-secondary" id="reset-filters">
+                                    <i class="fas fa-undo me-1"></i> Reset
+                                </button>
+                                <div class="btn-group ms-2">
+                                    <button class="btn btn-sm btn-success dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-file-export me-1"></i> Export
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                        <li><a class="dropdown-item" href="#" id="export-excel"><i class="fas fa-file-excel me-2"></i>Excel</a></li>
+                                        <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf me-2"></i>PDF</a></li>
+                                        <li><a class="dropdown-item" href="#" id="export-csv"><i class="fas fa-file-csv me-2"></i>CSV</a></li>
+                                    </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                    <!-- Purchases Table -->
+                    <div id="purchases-table" class="table-responsive">
+                        <h5 class="mb-3">Purchase Records</h5>
+                        {% if purchases %}
+                        <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Party</th>
+                                <th>Description</th>
+                                <th>Carat</th>
+                                    <th>Amount (USD)</th>
+                                    <th>Amount (INR)</th>
+                                <th>Payment Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for purchase in purchases %}
+                                <tr>
+                                    <td>{{ purchase.date }}</td>
+                                    <td>{{ purchase.party }}</td>
+                                    <td>{{ purchase.description }}</td>
+                                    <td>{{ purchase.carat }}</td>
+                                    <td>${{ purchase.amount_usd|format_currency }}</td>
+                                    <td>₹{{ purchase.amount_inr|format_currency }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if purchase.payment_status == 'Completed' else 'warning' if purchase.payment_status == 'Partial' else 'danger' }}">
+                                            {{ purchase.payment_status }}
+                                            </span>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info view-record" data-record-id="{{ purchase.id }}" data-record-type="purchase">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-primary edit-record" data-record-id="{{ purchase.id }}" data-record-type="purchase">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        <a href="#" class="btn btn-sm btn-danger delete-record" data-record-id="{{ purchase.id }}" data-record-type="purchase">
+                                                <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                            {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            No purchase records found.
+                                        </div>
+                            {% endif %}
+            </div>
+            
+                    <!-- Sales Table -->
+                    <div id="sales-table" class="table-responsive mt-4">
+                        <h5 class="mb-3">Sale Records</h5>
+                        {% if sales %}
+                        <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Party</th>
+                                <th>Description</th>
+                                <th>Carat</th>
+                                    <th>Amount (USD)</th>
+                                    <th>Amount (INR)</th>
+                                <th>Payment Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for sale in sales %}
+                                <tr>
+                                    <td>{{ sale.date }}</td>
+                                    <td>{{ sale.party }}</td>
+                                    <td>{{ sale.description }}</td>
+                                    <td>{{ sale.carat }}</td>
+                                    <td>${{ sale.amount_usd|format_currency }}</td>
+                                    <td>₹{{ sale.amount_inr|format_currency }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if sale.payment_status == 'Completed' else 'warning' if sale.payment_status == 'Partial' else 'danger' }}">
+                                            {{ sale.payment_status }}
+                                            </span>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info view-record" data-record-id="{{ sale.id }}" data-record-type="sale">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-primary edit-record" data-record-id="{{ sale.id }}" data-record-type="sale">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        <a href="#" class="btn btn-sm btn-danger delete-record" data-record-id="{{ sale.id }}" data-record-type="sale">
+                                                <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                            {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            No sale records found.
+                                        </div>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Record Details Modal -->
+<div class="modal fade" id="recordDetailsModal" tabindex="-1" aria-labelledby="recordDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recordDetailsModalLabel">Record Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="recordDetailsContent">
+                <!-- Content will be loaded dynamically -->
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editRecordBtn">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteRecordModal" tabindex="-1" aria-labelledby="deleteRecordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteRecordModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body">
+                <p>Are you sure you want to delete this record? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const allTab = document.getElementById('all-tab');
+        const purchasesTab = document.getElementById('purchases-tab');
+        const salesTab = document.getElementById('sales-tab');
+        const purchasesTable = document.getElementById('purchases-table');
+        const salesTable = document.getElementById('sales-table');
+        
+        // Initialize - show both tables by default
+        purchasesTable.style.display = 'block';
+        salesTable.style.display = 'block';
+        allTab.classList.add('active');
+        purchasesTab.classList.remove('active');
+        salesTab.classList.remove('active');
+        
+        allTab.addEventListener('click', function() {
+            purchasesTable.style.display = 'block';
+            salesTable.style.display = 'block';
+            allTab.classList.add('active');
+            purchasesTab.classList.remove('active');
+            salesTab.classList.remove('active');
+        });
+        
+        purchasesTab.addEventListener('click', function() {
+            purchasesTable.style.display = 'block';
+            salesTable.style.display = 'none';
+            allTab.classList.remove('active');
+            purchasesTab.classList.add('active');
+            salesTab.classList.remove('active');
+        });
+        
+        salesTab.addEventListener('click', function() {
+            purchasesTable.style.display = 'none';
+            salesTable.style.display = 'block';
+            allTab.classList.remove('active');
+            purchasesTab.classList.remove('active');
+            salesTab.classList.add('active');
+        });
+        
+        // View record details
+        const viewRecordBtns = document.querySelectorAll('.view-record');
+        const recordDetailsModal = new bootstrap.Modal(document.getElementById('recordDetailsModal'));
+        const recordDetailsContent = document.getElementById('recordDetailsContent');
+        const editRecordBtn = document.getElementById('editRecordBtn');
+        
+        viewRecordBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const recordId = this.getAttribute('data-record-id');
+                const recordType = this.getAttribute('data-record-type');
+                
+                // Show loading spinner
+                recordDetailsContent.innerHTML = `
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+                
+                // In a real implementation, you would fetch the record details from the server
+                // For now, we'll just show a placeholder
+                setTimeout(() => {
+                    recordDetailsContent.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Viewing details for ${recordType} record #${recordId}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Date:</strong> 2023-03-15</p>
+                                <p><strong>Party:</strong> Sample Party</p>
+                                <p><strong>Description:</strong> Sample Description</p>
+                                <p><strong>Carat:</strong> 1.5</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Amount (USD):</strong> $1,500.00</p>
+                                <p><strong>Amount (INR):</strong> ₹112,500.00</p>
+                                <p><strong>Payment Status:</strong> <span class="badge bg-warning">Partial</span></p>
+                                <p><strong>Created By:</strong> Admin</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Set up the edit button
+                    editRecordBtn.setAttribute('data-record-id', recordId);
+                    editRecordBtn.setAttribute('data-record-type', recordType);
+                }, 500);
+                
+                recordDetailsModal.show();
+            });
+        });
+        
+        // Edit record
+        editRecordBtn.addEventListener('click', function() {
+            const recordId = this.getAttribute('data-record-id');
+                const recordType = this.getAttribute('data-record-type');
+            
+            // In a real implementation, you would redirect to the edit page
+            alert(`Editing ${recordType} record #${recordId}`);
+            recordDetailsModal.hide();
+        });
+        
+        // Delete record
+        const deleteRecordBtns = document.querySelectorAll('.delete-record');
+        const deleteRecordModal = new bootstrap.Modal(document.getElementById('deleteRecordModal'));
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        deleteRecordBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const recordId = this.getAttribute('data-record-id');
+                const recordType = this.getAttribute('data-record-type');
+                
+                // Set up the confirm delete button
+                confirmDeleteBtn.setAttribute('data-record-id', recordId);
+                confirmDeleteBtn.setAttribute('data-record-type', recordType);
+                
+                deleteRecordModal.show();
+            });
+        });
+        
+        // Confirm delete
+        confirmDeleteBtn.addEventListener('click', function() {
+            const recordId = this.getAttribute('data-record-id');
+            const recordType = this.getAttribute('data-record-type');
+            
+            // In a real implementation, you would send a delete request to the server
+            alert(`Deleting ${recordType} record #${recordId}`);
+            deleteRecordModal.hide();
+        });
+        
+        // Filter functionality
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const resetFiltersBtn = document.getElementById('reset-filters');
+        
+        applyFiltersBtn.addEventListener('click', function() {
+            // Get filter values
+            const dateRange = document.getElementById('date-range').value;
+            const paymentStatus = document.getElementById('payment-status').value;
+            const partyFilter = document.getElementById('party-filter').value.toLowerCase();
+            const minAmount = document.getElementById('min-amount').value;
+            const maxAmount = document.getElementById('max-amount').value;
+            
+            // Apply filters to purchase rows
+            const purchaseRows = document.querySelectorAll('#purchases-table tbody tr');
+            purchaseRows.forEach(row => {
+                let showRow = true;
+                
+                // Party filter
+                if (partyFilter) {
+                    const partyCell = row.querySelector('td:nth-child(2)');
+                    if (!partyCell.textContent.toLowerCase().includes(partyFilter)) {
+                        showRow = false;
+                    }
+                }
+                
+                // Payment status filter
+                if (paymentStatus !== 'all') {
+                    const statusCell = row.querySelector('td:nth-child(7) .badge');
+                    const status = statusCell.textContent.trim().toLowerCase();
+                    if (status !== paymentStatus.toLowerCase()) {
+                        showRow = false;
+                    }
+                }
+                
+                // Amount filter
+                if (minAmount || maxAmount) {
+                    const amountCell = row.querySelector('td:nth-child(5)');
+                    const amount = parseFloat(amountCell.textContent.replace('$', '').replace(',', ''));
+                    
+                    if (minAmount && amount < parseFloat(minAmount)) {
+                        showRow = false;
+                    }
+                    
+                    if (maxAmount && amount > parseFloat(maxAmount)) {
+                        showRow = false;
+                    }
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+            
+            // Apply filters to sales rows
+            const salesRows = document.querySelectorAll('#sales-table tbody tr');
+            salesRows.forEach(row => {
+                let showRow = true;
+                
+                // Party filter
+                if (partyFilter) {
+                    const partyCell = row.querySelector('td:nth-child(2)');
+                    if (!partyCell.textContent.toLowerCase().includes(partyFilter)) {
+                        showRow = false;
+                    }
+                }
+                
+                // Payment status filter
+                if (paymentStatus !== 'all') {
+                    const statusCell = row.querySelector('td:nth-child(7) .badge');
+                    const status = statusCell.textContent.trim().toLowerCase();
+                    if (status !== paymentStatus.toLowerCase()) {
+                        showRow = false;
+                    }
+                }
+                
+                // Amount filter
+                if (minAmount || maxAmount) {
+                    const amountCell = row.querySelector('td:nth-child(5)');
+                    const amount = parseFloat(amountCell.textContent.replace('$', '').replace(',', ''));
+                    
+                    if (minAmount && amount < parseFloat(minAmount)) {
+                        showRow = false;
+                    }
+                    
+                    if (maxAmount && amount > parseFloat(maxAmount)) {
+                        showRow = false;
+                    }
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+        });
+        
+        resetFiltersBtn.addEventListener('click', function() {
+            // Reset filter inputs
+            document.getElementById('date-range').value = 'month';
+            document.getElementById('payment-status').value = 'all';
+            document.getElementById('party-filter').value = '';
+            document.getElementById('min-amount').value = '';
+            document.getElementById('max-amount').value = '';
+            
+            // Show all rows
+            const allRows = document.querySelectorAll('#purchases-table tbody tr, #sales-table tbody tr');
+            allRows.forEach(row => {
+                row.style.display = '';
+            });
+        });
+        
+        // Export functionality
+        const exportExcelBtn = document.getElementById('export-excel');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const exportCsvBtn = document.getElementById('export-csv');
+        
+        exportExcelBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Determine which tables are visible
+            const purchasesVisible = purchasesTable.style.display !== 'none';
+            const salesVisible = salesTable.style.display !== 'none';
+            
+            // Create a message based on what's being exported
+            let message = 'Exporting ';
+            if (purchasesVisible && salesVisible) {
+                message += 'all records';
+            } else if (purchasesVisible) {
+                message += 'purchase records';
+            } else if (salesVisible) {
+                message += 'sales records';
+            }
+            message += ' to Excel...';
+            
+            // In a real implementation, you would generate and download the Excel file
+            alert(message);
+            
+            // Example of how to trigger a download in a real implementation:
+            // window.location.href = '/export/excel?type=' + 
+            //    (purchasesVisible && salesVisible ? 'all' : 
+            //     (purchasesVisible ? 'purchases' : 'sales'));
+        });
+        
+        exportPdfBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Determine which tables are visible
+            const purchasesVisible = purchasesTable.style.display !== 'none';
+            const salesVisible = salesTable.style.display !== 'none';
+            
+            // Create a message based on what's being exported
+            let message = 'Exporting ';
+            if (purchasesVisible && salesVisible) {
+                message += 'all records';
+            } else if (purchasesVisible) {
+                message += 'purchase records';
+            } else if (salesVisible) {
+                message += 'sales records';
+            }
+            message += ' to PDF...';
+            
+            // In a real implementation, you would generate and download the PDF file
+            alert(message);
+            
+            // Example of how to trigger a download in a real implementation:
+            // window.location.href = '/export/pdf?type=' + 
+            //    (purchasesVisible && salesVisible ? 'all' : 
+            //     (purchasesVisible ? 'purchases' : 'sales'));
+        });
+        
+        exportCsvBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Determine which tables are visible
+            const purchasesVisible = purchasesTable.style.display !== 'none';
+            const salesVisible = salesTable.style.display !== 'none';
+            
+            // Create a message based on what's being exported
+            let message = 'Exporting ';
+            if (purchasesVisible && salesVisible) {
+                message += 'all records';
+            } else if (purchasesVisible) {
+                message += 'purchase records';
+            } else if (salesVisible) {
+                message += 'sales records';
+            }
+            message += ' to CSV...';
+            
+            // In a real implementation, you would generate and download the CSV file
+            alert(message);
+            
+            // Example of how to trigger a download in a real implementation:
+            // window.location.href = '/export/csv?type=' + 
+            //    (purchasesVisible && salesVisible ? 'all' : 
+            //     (purchasesVisible ? 'purchases' : 'sales'));
+        });
+    });
+</script>
+{% endblock %} 

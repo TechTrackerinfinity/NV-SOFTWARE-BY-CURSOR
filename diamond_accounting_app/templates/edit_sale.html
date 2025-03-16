@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Sale - Shree Dangigev Diamonds{% endblock %}
+
+{% block content %}
+<div class="card shadow-lg border-0 rounded-lg">
+    <div class="card-header">
+        <h3 class="text-center font-weight-light my-2">
+            <i class="fas fa-edit me-2 text-success"></i>Edit Sale Record
+        </h3>
+    </div>
+    <div class="card-body">
+        <form action="{{ url_for('edit_record', record_type='sale', record_index=record_index) }}" method="post">
+            <!-- Basic Information Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="date" name="date" type="date" value="{{ record.Date }}" required />
+                                <label for="date">Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="party" name="party" type="text" value="{{ record.Party }}" required />
+                                <label for="party">Party</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input class="form-control" id="description" name="description" type="text" value="{{ record.Description }}" required />
+                        <label for="description">Description</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diamond Identification Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-gem me-2"></i>Diamond Identification</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="stone_id" name="stone_id" type="text" value="{{ record['Stone ID'] if 'Stone ID' in record else '' }}" />
+                                <label for="stone_id">Stone ID</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="rough_id" name="rough_id" type="text" value="{{ record['Rough ID'] if 'Rough ID' in record else '' }}" />
+                                <label for="rough_id">Rough ID</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="kapan_no" name="kapan_no" type="text" value="{{ record['Kapan No'] if 'Kapan No' in record else '' }}" />
+                                <label for="kapan_no">Kapan No</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="platform" name="platform" type="text" value="{{ record.Platform if 'Platform' in record else '' }}" />
+                                <label for="platform">Platform</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diamond Specifications Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Diamond Specifications</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="carat" name="carat" type="number" step="0.01" min="0.01" value="{{ record.Carat }}" required />
+                                <label for="carat">Carat</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="quantity" name="quantity" type="number" min="1" value="{{ record.Than if 'Than' in record else record.Quantity if 'Quantity' in record else 1 }}" required />
+                                <label for="quantity">Than</label>
+                            </div>
+                        </div>
+                        <!-- Hidden field for Pieces, set to 1 by default -->
+                        <input type="hidden" id="pcs" name="pcs" value="1">
+                        <div class="col-md-3">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="price_per_carat" name="price_per_carat" type="number" step="0.01" min="0.01" value="{{ record['Price Per Carat'] }}" required />
+                                <label for="price_per_carat">Price Per Carat (USD)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="price_per_carat_inr" name="price_per_carat_inr" type="number" step="0.01" min="0.01" value="{{ record['Price Per Carat INR'] if 'Price Per Carat INR' in record else (record['Price Per Carat'] * record.Rate)|float|round(2) if 'Rate' in record else (record['Price Per Carat'] * 83.50)|float|round(2) }}" />
+                                <label for="price_per_carat_inr">Price Per Carat (INR)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="rate" name="rate" type="number" step="0.01" min="0.01" value="{{ record.Rate if 'Rate' in record else 87.00 }}" required />
+                                <label for="rate">Exchange Rate (USD to INR)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" id="fetchLiveRate" class="btn btn-outline-primary mt-3">
+                                <i class="fas fa-sync-alt me-1"></i>Fetch Live Rate
+                            </button>
+                            <small id="rateStatus" class="form-text text-muted d-block mt-2"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Amount Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title"><i class="fas fa-calculator me-2"></i>Total Amount</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-primary-light rounded-lg border-0 mb-md-0 mb-3">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-primary mb-1">Total Amount (INR)</h6>
+                                            <h4 class="mb-0 fw-bold" id="totalAmountInr">
+                                                ₹{{ '{:,.2f}'.format(record['Total Amount INR']|float) if 'Total Amount INR' in record and record['Total Amount INR'] and record['Total Amount INR'] != 'nan' else '0.00' }}
+                                            </h4>
+                                        </div>
+                                        <div class="fs-1 text-primary opacity-25">
+                                            <i class="fas fa-rupee-sign"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-secondary-light rounded-lg border-0">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="text-secondary mb-1">Total Amount (USD)</h6>
+                                            <h4 class="mb-0 fw-bold" id="totalAmountUsd">
+                                                ${{ '{:,.2f}'.format(record['Total Amount USD']|float) if 'Total Amount USD' in record and record['Total Amount USD'] and record['Total Amount USD'] != 'nan' else '{:,.2f}'.format(record['Total Amount']|float) if 'Total Amount' in record and record['Total Amount'] and record['Total Amount'] != 'nan' else '0.00' }}
+                                            </h4>
+                                        </div>
+                                        <div class="fs-1 text-secondary opacity-25">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <small class="text-muted" id="calculation_text">Carat × Price Per Carat</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Information Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="payment_status" name="payment_status">
+                                    <option value="Pending" {% if record['Payment Status'] == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Partial" {% if record['Payment Status'] == 'Partial' %}selected{% endif %}>Partial</option>
+                                    <option value="Completed" {% if record['Payment Status'] == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <label for="payment_status">Payment Status</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="reference_party" name="reference_party" type="text" value="{{ record['Reference Party'] if 'Reference Party' in record else '' }}" />
+                                <label for="reference_party">Reference Party</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="payment_due_date" name="payment_due_date" type="date" value="{{ record['Payment Due Date'] if 'Payment Due Date' in record else '' }}" />
+                                <label for="payment_due_date">Payment Due Date</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="payment_days" name="payment_days" type="number" min="1" placeholder="Days" value="{{ record['Payment Days'] if 'Payment Days' in record else '' }}">
+                                <label for="payment_days">Due in Days</label>
+                                <div class="form-text">Days counted from day after transaction date</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="payment_done_date" name="payment_done_date" type="date" value="{{ record['Payment Done Date'] if 'Payment Done Date' in record else '' }}" />
+                                <label for="payment_done_date">Payment Done Date</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Additional Notes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="notes" name="notes" style="height: 100px">{{ record.Notes if 'Notes' in record else '' }}</textarea>
+                        <label for="notes">Notes</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 mb-0">
+                <a class="btn btn-secondary" href="{{ url_for('records') }}">Cancel</a>
+                <button class="btn btn-success" type="submit">Update Sale Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get input elements
+        const caratInput = document.getElementById('carat');
+        const quantityInput = document.getElementById('quantity');
+        const pcsInput = document.getElementById('pcs');
+        const pricePerCaratInput = document.getElementById('price_per_carat');
+        const rateInput = document.getElementById('rate');
+        const totalUsdElement = document.getElementById('totalAmountUsd');
+        const totalInrElement = document.getElementById('totalAmountInr');
+        const calculationTextElement = document.getElementById('calculation_text');
+
+        function calculateTotal() {
+            const carat = parseFloat(caratInput.value) || 0;
+            const quantity = parseInt(quantityInput.value) || 1;
+            const pcs = parseInt(pcsInput.value) || 1;
+            const priceUsd = parseFloat(pricePerCaratInput.value) || 0;
+            const rate = parseFloat(rateInput.value) || 87.00;
+
+            // Calculate totals without Than in the calculation
+            let totalUsd = carat * priceUsd;
+            let totalInr = totalUsd * rate;
+
+            // Format numbers with commas
+            function formatNumberWithCommas(number) {
+                const parts = number.toString().split('.');
+                parts[0] = parts[0].replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',');
+                return parts.join('.');
+            }
+
+            totalUsdElement.textContent = '$' + formatNumberWithCommas(totalUsd.toFixed(2));
+            totalInrElement.textContent = '₹' + formatNumberWithCommas(totalInr.toFixed(2));
+            calculationTextElement.textContent = `Carat (${carat}) × Price Per Carat (${priceUsd})`;
+        }
+
+        // Add event listeners to all inputs that affect the calculation
+        caratInput.addEventListener('input', calculateTotal);
+        quantityInput.addEventListener('input', calculateTotal);
+        pcsInput.addEventListener('input', calculateTotal);
+        pricePerCaratInput.addEventListener('input', calculateTotal);
+        rateInput.addEventListener('input', calculateTotal);
+
+        // Initialize the calculation when the page loads
+        calculateTotal();
+    });
+</script>
+{% endblock %} 

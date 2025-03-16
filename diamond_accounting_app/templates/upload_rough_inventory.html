@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Rough Inventory - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Upload Rough Inventory{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('rough_inventory') }}">Rough Inventory</a></li>
+<li class="breadcrumb-item active">Upload Inventory</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Upload Rough Inventory from Excel</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">Instructions</h6>
+                                <p>Please follow these guidelines to ensure successful upload:</p>
+                                <ol>
+                                    <li>Use the template provided below or ensure your Excel file has the following columns:
+                                        <ul>
+                                            <li>description (required)</li>
+                                            <li>source (required)</li>
+                                            <li>origin (optional)</li>
+                                            <li>lot_id (optional)</li>
+                                            <li>weight (required, in carats)</li>
+                                            <li>pieces (required)</li>
+                                            <li>purchase_price (required, in ₹)</li>
+                                            <li>purchase_date (required, format: YYYY-MM-DD)</li>
+                                            <li>status (required, one of: In Stock, Processing, Sold, Reserved)</li>
+                                            <li>location (required)</li>
+                                            <li>notes (optional)</li>
+                                        </ul>
+                                    </li>
+                                    <li>Save your file as .xlsx or .csv format</li>
+                                    <li>Ensure all required fields are filled in</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('static', filename='templates/rough_inventory_template.xlsx') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-download"></i> Download Template
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <form id="uploadForm" action="{{ url_for('upload_rough_inventory') }}" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="file" class="form-control-label">Select Excel File <span class="text-danger">*</span></label>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.csv" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="update_existing" name="update_existing" value="1">
+                                    <label class="form-check-label" for="update_existing">
+                                        Update existing items if lot_id matches
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12 text-end">
+                                <a href="{{ url_for('rough_inventory') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    {% if results %}
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header pb-0">
+                                    <h6>Upload Results</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-{{ 'success' if results.success else 'danger' }}">
+                                        <h6 class="alert-heading">{{ 'Success' if results.success else 'Error' }}</h6>
+                                        <p>{{ results.message }}</p>
+                                    </div>
+                                    
+                                    {% if results.details %}
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Row</th>
+                                                    <th>Status</th>
+                                                    <th>Details</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for detail in results.details %}
+                                                <tr>
+                                                    <td>{{ detail.row }}</td>
+                                                    <td>
+                                                        <span class="badge bg-{{ 'success' if detail.success else 'danger' }}">
+                                                            {{ 'Success' if detail.success else 'Error' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ detail.message }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if results.success %}
+                                    <div class="text-end mt-3">
+                                        <a href="{{ url_for('rough_inventory') }}" class="btn btn-primary">
+                                            <i class="fas fa-arrow-right"></i> Go to Inventory
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('file');
+        
+        form.addEventListener('submit', function(event) {
+            if (!fileInput.value) {
+                event.preventDefault();
+                alert('Please select a file to upload.');
+                return;
+            }
+            
+            const fileExtension = fileInput.value.split('.').pop().toLowerCase();
+            if (fileExtension !== 'xlsx' && fileExtension !== 'csv') {
+                event.preventDefault();
+                alert('Please upload a valid Excel (.xlsx) or CSV (.csv) file.');
+                return;
+            }
+        });
+    });
+</script>
+{% endblock %} 

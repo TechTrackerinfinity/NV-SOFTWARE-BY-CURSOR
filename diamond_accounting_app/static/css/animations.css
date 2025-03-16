@@ -1,0 +1,430 @@
+/* Animations for Diamond Accounting App */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+    will-change: opacity;
+}
+
+/* Fade In Up Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s linear forwards;
+}
+
+/* Fade In Down Animation */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-down {
+    animation: fadeInDown 0.5s linear forwards;
+}
+
+/* Fade In Left Animation */
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in-left {
+    animation: fadeInLeft 0.5s linear forwards;
+}
+
+/* Fade In Right Animation */
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in-right {
+    animation: fadeInRight 0.5s linear forwards;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scale-in {
+    animation: scaleIn 0.5s linear forwards;
+}
+
+/* Pulse Animation - Removed bouncy behavior */
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.8;
+    }
+}
+
+.pulse {
+    animation: pulse 1.5s linear infinite;
+    will-change: opacity;
+}
+
+/* Shake Animation */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.8s;
+}
+
+/* Spin Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+    will-change: transform;
+}
+
+/* Slide In Animation */
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s linear forwards;
+}
+
+/* Animation Delays */
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.2s;
+}
+
+.delay-3 {
+    animation-delay: 0.3s;
+}
+
+.delay-4 {
+    animation-delay: 0.4s;
+}
+
+.delay-5 {
+    animation-delay: 0.5s;
+}
+
+/* Animation Durations */
+.duration-1 {
+    animation-duration: 0.3s;
+}
+
+.duration-2 {
+    animation-duration: 0.5s;
+}
+
+.duration-3 {
+    animation-duration: 0.8s;
+}
+
+.duration-4 {
+    animation-duration: 1s;
+}
+
+.duration-5 {
+    animation-duration: 1.5s;
+}
+
+/* Hover Animations - Remove ALL movement effects */
+.hover-lift {
+    transition: box-shadow 0.3s linear;
+    will-change: box-shadow;
+}
+
+.hover-lift:hover {
+    /* Removed translateY movement */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+    /* Removed transform scale effect */
+    transition: opacity 0.3s linear;
+}
+
+.hover-scale:hover {
+    /* Removed scale transform */
+    opacity: 0.9;
+}
+
+.hover-rotate {
+    /* Removed transform rotation effect */
+    transition: opacity 0.3s linear;
+}
+
+.hover-rotate:hover {
+    /* Removed rotate transform */
+    opacity: 0.9;
+}
+
+.hover-shadow {
+    transition: box-shadow 0.3s linear;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Page Transition */
+.page-transition {
+    transition: opacity 0.3s linear;
+}
+
+.page-transition.loading {
+    opacity: 0;
+}
+
+.page-transition.loaded {
+    opacity: 1;
+}
+
+/* Animation Definitions */
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+/* Animation Classes */
+.slide-in-left {
+    animation: slideInLeft 0.5s linear forwards;
+    will-change: opacity, transform;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s linear forwards;
+    will-change: opacity, transform;
+}
+
+/* Animation Delays */
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+.delay-400 {
+    animation-delay: 400ms;
+}
+
+.delay-500 {
+    animation-delay: 500ms;
+}
+
+/* Transition Classes */
+.transition-all {
+    transition: all 0.3s linear;
+}
+
+.transition-transform {
+    transition: transform 0.3s linear;
+    will-change: transform;
+}
+
+.transition-opacity {
+    transition: opacity 0.3s linear;
+    will-change: opacity;
+}
+
+.transition-colors {
+    transition: background-color 0.3s linear, color 0.3s linear, border-color 0.3s linear;
+}
+
+/* Hover Effects */
+.hover-bright {
+    transition: filter 0.3s linear;
+}
+
+.hover-bright:hover {
+    filter: brightness(1.1);
+}
+
+/* Loading Animations */
+.loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    will-change: transform;
+}
+
+.loading-dots {
+    display: inline-flex;
+    align-items: center;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 1.5s linear infinite;
+    will-change: opacity;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.loading-shimmer {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0), 
+        rgba(255, 255, 255, 0.5), 
+        rgba(255, 255, 255, 0));
+    background-size: 1000px 100%;
+    animation: shimmer 2s linear infinite;
+    will-change: background-position;
+}
+
+/* Alert Animations */
+.alert-enter {
+    animation: fadeIn 0.3s linear forwards;
+    will-change: opacity;
+}
+
+.alert-exit {
+    animation: fadeIn 0.3s linear backwards reverse;
+    will-change: opacity;
+}
+
+/* Staggered Animations for Lists */
+.stagger-item {
+    opacity: 0;
+}
+
+.stagger-item:nth-child(1) { animation: fadeIn 0.5s linear forwards 0.1s; }
+.stagger-item:nth-child(2) { animation: fadeIn 0.5s linear forwards 0.2s; }
+.stagger-item:nth-child(3) { animation: fadeIn 0.5s linear forwards 0.3s; }
+.stagger-item:nth-child(4) { animation: fadeIn 0.5s linear forwards 0.4s; }
+.stagger-item:nth-child(5) { animation: fadeIn 0.5s linear forwards 0.5s; }
+.stagger-item:nth-child(6) { animation: fadeIn 0.5s linear forwards 0.6s; }
+.stagger-item:nth-child(7) { animation: fadeIn 0.5s linear forwards 0.7s; }
+.stagger-item:nth-child(8) { animation: fadeIn 0.5s linear forwards 0.8s; }
+.stagger-item:nth-child(9) { animation: fadeIn 0.5s linear forwards 0.9s; }
+.stagger-item:nth-child(10) { animation: fadeIn 0.5s linear forwards 1s; }
+
+/* Performance Optimizations */
+.stagger-item {
+    will-change: opacity;
+}
+
+/* Reduce animation on user preference */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .fade-in, .slide-in-left, .slide-in-right, 
+    .pulse, .spin, .stagger-item,
+    .alert-enter, .alert-exit {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    .loading-spinner, .loading-dots span, .loading-shimmer {
+        animation: none !important;
+    }
+} 

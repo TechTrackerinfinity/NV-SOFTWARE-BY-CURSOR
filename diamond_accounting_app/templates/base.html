@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Diamond Accounting System for Shree Dangigev Diamonds">
+    <meta name="theme-color" content="#4f46e5">
+    <title>{% block title %}Shree Dangigev Diamonds - Diamond Accounting{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading d-flex align-items-center">
+                <i class="fas fa-gem me-2 text-primary"></i>
+                <span>Dangigev Diamonds</span>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('index') }}" class="list-group-item list-group-item-action {% if request.path == url_for('index') %}active{% endif %}">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="list-group-item list-group-item-action {% if request.path == url_for('dashboard') %}active{% endif %}">
+                    <i class="fas fa-chart-line me-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('inventory') }}" class="list-group-item list-group-item-action {% if request.path == url_for('inventory') %}active{% endif %}">
+                    <i class="fas fa-gem me-2"></i>Polished Inventory
+                </a>
+                <a href="{{ url_for('rough_inventory') }}" class="list-group-item list-group-item-action {% if request.path == url_for('rough_inventory') %}active{% endif %}">
+                    <i class="fas fa-cubes me-2"></i>Rough Inventory
+                </a>
+                <a href="{{ url_for('buy') }}" class="list-group-item list-group-item-action {% if request.path == url_for('buy') %}active{% endif %}">
+                    <i class="fas fa-shopping-cart me-2"></i>Buy
+                </a>
+                <a href="{{ url_for('sell') }}" class="list-group-item list-group-item-action {% if request.path == url_for('sell') %}active{% endif %}">
+                    <i class="fas fa-tags me-2"></i>Sell
+                </a>
+                <a href="{{ url_for('records') }}" class="list-group-item list-group-item-action {% if request.path == url_for('records') %}active{% endif %}">
+                    <i class="fas fa-file-alt me-2"></i>Records
+                </a>
+                <a href="{{ url_for('payments') }}" class="list-group-item list-group-item-action {% if request.path == url_for('payments') %}active{% endif %}">
+                    <i class="fas fa-money-bill-wave me-2"></i>Payments
+                </a>
+                <a href="{{ url_for('reports') }}" class="list-group-item list-group-item-action {% if request.path == url_for('reports') %}active{% endif %}">
+                    <i class="fas fa-chart-bar me-2"></i>Reports
+                </a>
+                <a href="{{ url_for('backup') }}" class="list-group-item list-group-item-action {% if request.path == url_for('backup') %}active{% endif %}">
+                    <i class="fas fa-database me-2"></i>Backup & Restore
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <small class="text-muted">v1.0.0</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-flex align-items-center ms-auto">
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary me-2" type="button" id="quickActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Quick actions">
+                                <i class="fas fa-bolt"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="quickActionsDropdown">
+                                <li><h6 class="dropdown-header">Quick Actions</h6></li>
+                                <li><a class="dropdown-item" href="{{ url_for('buy') }}"><i class="fas fa-shopping-cart me-2"></i>New Purchase</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('sell') }}"><i class="fas fa-tags me-2"></i>New Sale</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('records') }}"><i class="fas fa-search me-2"></i>Search Records</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('backup') }}"><i class="fas fa-database me-2"></i>Backup & Restore</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown ms-2">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+                                <i class="fas fa-user-circle me-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userDropdown">
+                                <li><hr class="dropdown-divider"></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Flash Messages -->
+            <div class="container-fluid px-4 py-3" id="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Main Content -->
+            <div class="container-fluid px-4 py-2">
+                <div class="page-header mb-4">
+                    <h1 class="fs-3 fw-bold">{% block page_title %}{% endblock %}</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                            {% block breadcrumb %}{% endblock %}
+                        </ol>
+                    </nav>
+                </div>
+                
+                {% block content %}{% endblock %}
+            </div>
+            
+            <!-- Footer -->
+            <footer class="bg-light text-center text-lg-start mt-5">
+                <div class="text-center p-3">
+                    <!-- Copyright removed as requested -->
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Polished Inventory Item - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Edit Polished Inventory Item{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{{ url_for('inventory') }}">Polished Inventory</a></li>
+<li class="breadcrumb-item active">Edit Item</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6>Edit Diamond - {{ item.id }}</h6>
+                        <a href="{{ url_for('inventory_item_details', item_id=item.id) }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Details
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('edit_inventory_item', item_id=item.id) }}" method="post" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="description" name="description" value="{{ item.description }}" required>
+                                <div class="invalid-feedback">Please provide a description.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="shape" class="form-label">Shape</label>
+                                <select class="form-select" id="shape" name="shape" required>
+                                    <option value="">Select Shape</option>
+                                    <option value="Round" {% if item.shape == 'Round' %}selected{% endif %}>Round</option>
+                                    <option value="Princess" {% if item.shape == 'Princess' %}selected{% endif %}>Princess</option>
+                                    <option value="Cushion" {% if item.shape == 'Cushion' %}selected{% endif %}>Cushion</option>
+                                    <option value="Emerald" {% if item.shape == 'Emerald' %}selected{% endif %}>Emerald</option>
+                                    <option value="Oval" {% if item.shape == 'Oval' %}selected{% endif %}>Oval</option>
+                                    <option value="Radiant" {% if item.shape == 'Radiant' %}selected{% endif %}>Radiant</option>
+                                    <option value="Asscher" {% if item.shape == 'Asscher' %}selected{% endif %}>Asscher</option>
+                                    <option value="Heart" {% if item.shape == 'Heart' %}selected{% endif %}>Heart</option>
+                                    <option value="Marquise" {% if item.shape == 'Marquise' %}selected{% endif %}>Marquise</option>
+                                    <option value="Pear" {% if item.shape == 'Pear' %}selected{% endif %}>Pear</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a shape.</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="carats" class="form-label">Carats</label>
+                                <input type="number" step="0.01" class="form-control" id="carats" name="carats" value="{{ item.carats }}" required>
+                                <div class="invalid-feedback">Please provide carat weight.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="color" class="form-label">Color</label>
+                                <select class="form-select" id="color" name="color" required>
+                                    <option value="">Select Color</option>
+                                    <option value="D" {% if item.color == 'D' %}selected{% endif %}>D (Colorless)</option>
+                                    <option value="E" {% if item.color == 'E' %}selected{% endif %}>E (Colorless)</option>
+                                    <option value="F" {% if item.color == 'F' %}selected{% endif %}>F (Colorless)</option>
+                                    <option value="G" {% if item.color == 'G' %}selected{% endif %}>G (Near Colorless)</option>
+                                    <option value="H" {% if item.color == 'H' %}selected{% endif %}>H (Near Colorless)</option>
+                                    <option value="I" {% if item.color == 'I' %}selected{% endif %}>I (Near Colorless)</option>
+                                    <option value="J" {% if item.color == 'J' %}selected{% endif %}>J (Near Colorless)</option>
+                                    <option value="K" {% if item.color == 'K' %}selected{% endif %}>K (Faint)</option>
+                                    <option value="L" {% if item.color == 'L' %}selected{% endif %}>L (Faint)</option>
+                                    <option value="M" {% if item.color == 'M' %}selected{% endif %}>M (Faint)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a color grade.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="clarity" class="form-label">Clarity</label>
+                                <select class="form-select" id="clarity" name="clarity" required>
+                                    <option value="">Select Clarity</option>
+                                    <option value="FL" {% if item.clarity == 'FL' %}selected{% endif %}>FL (Flawless)</option>
+                                    <option value="IF" {% if item.clarity == 'IF' %}selected{% endif %}>IF (Internally Flawless)</option>
+                                    <option value="VVS1" {% if item.clarity == 'VVS1' %}selected{% endif %}>VVS1 (Very Very Slightly Included 1)</option>
+                                    <option value="VVS2" {% if item.clarity == 'VVS2' %}selected{% endif %}>VVS2 (Very Very Slightly Included 2)</option>
+                                    <option value="VS1" {% if item.clarity == 'VS1' %}selected{% endif %}>VS1 (Very Slightly Included 1)</option>
+                                    <option value="VS2" {% if item.clarity == 'VS2' %}selected{% endif %}>VS2 (Very Slightly Included 2)</option>
+                                    <option value="SI1" {% if item.clarity == 'SI1' %}selected{% endif %}>SI1 (Slightly Included 1)</option>
+                                    <option value="SI2" {% if item.clarity == 'SI2' %}selected{% endif %}>SI2 (Slightly Included 2)</option>
+                                    <option value="I1" {% if item.clarity == 'I1' %}selected{% endif %}>I1 (Included 1)</option>
+                                    <option value="I2" {% if item.clarity == 'I2' %}selected{% endif %}>I2 (Included 2)</option>
+                                    <option value="I3" {% if item.clarity == 'I3' %}selected{% endif %}>I3 (Included 3)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a clarity grade.</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="cut" class="form-label">Cut</label>
+                                <select class="form-select" id="cut" name="cut" required>
+                                    <option value="">Select Cut</option>
+                                    <option value="Excellent" {% if item.cut == 'Excellent' %}selected{% endif %}>Excellent</option>
+                                    <option value="Very Good" {% if item.cut == 'Very Good' %}selected{% endif %}>Very Good</option>
+                                    <option value="Good" {% if item.cut == 'Good' %}selected{% endif %}>Good</option>
+                                    <option value="Fair" {% if item.cut == 'Fair' %}selected{% endif %}>Fair</option>
+                                    <option value="Poor" {% if item.cut == 'Poor' %}selected{% endif %}>Poor</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a cut grade.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="purchase_price" class="form-label">Purchase Price (₹)</label>
+                                <input type="number" class="form-control" id="purchase_price" name="purchase_price" value="{{ item.purchase_price }}" required>
+                                <div class="invalid-feedback">Please provide a purchase price.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="market_value" class="form-label">Market Value (₹)</label>
+                                <input type="number" class="form-control" id="market_value" name="market_value" value="{{ item.market_value }}" required>
+                                <div class="invalid-feedback">Please provide a market value.</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="In Stock" {% if item.status == 'In Stock' %}selected{% endif %}>In Stock</option>
+                                    <option value="Reserved" {% if item.status == 'Reserved' %}selected{% endif %}>Reserved</option>
+                                    <option value="Sold" {% if item.status == 'Sold' %}selected{% endif %}>Sold</option>
+                                    <option value="Damaged" {% if item.status == 'Damaged' %}selected{% endif %}>Damaged</option>
+                                    <option value="Lost" {% if item.status == 'Lost' %}selected{% endif %}>Lost</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a status.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label">Storage Location</label>
+                                <input type="text" class="form-control" id="location" name="location" value="{{ item.location }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ item.notes }}</textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('inventory_item_details', item_id=item.id) }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %} 

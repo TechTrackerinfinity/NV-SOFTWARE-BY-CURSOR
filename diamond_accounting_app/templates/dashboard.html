@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+<!-- Custom filter for Indian number formatting -->
+{% macro format_indian(number) %}
+    {% set num_str = '{:.2f}'.format(number|float) %}
+    {% set parts = num_str.split('.') %}
+    {% set int_part = parts[0]|string %}
+    {% set formatted = '' %}
+    
+    {% if int_part|length <= 3 %}
+        {% set formatted = int_part %}
+    {% else %}
+        {% set first_part = int_part[:-3] %}
+        {% set last_part = int_part[-3:] %}
+        
+        {% set remaining = first_part %}
+        {% set formatted = last_part %}
+        
+        {% for i in range(0, remaining|length, 2) %}
+            {% if i + 2 <= remaining|length %}
+                {% set formatted = remaining[remaining|length - i - 2:remaining|length - i] + ',' + formatted %}
+            {% else %}
+                {% set formatted = remaining[0:remaining|length - i] + ',' + formatted %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    {% if parts|length > 1 %}
+        {% set formatted = formatted + '.' + parts[1] %}
+    {% endif %}
+    
+    {{ formatted }}
+{% endmacro %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        border: none;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        color: var(--gray-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-change {
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .stat-change i {
+        margin-right: 0.25rem;
+    }
+    
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+    
+    .quick-actions .btn {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+    }
+    
+    .quick-actions .btn i {
+        margin-right: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .activity-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1rem;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .activity-time {
+        font-size: 0.75rem;
+        color: var(--gray-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Inventory Stats Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Polished Inventory</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ inventory_stats.get('total_items', 0) }} Items</div>
+                            <div class="text-muted small">{{ inventory_stats.get('total_carats', 0)|round(2) }} Carats</div>
+                            <div class="text-muted small">₹{{ inventory_stats.get('total_value', 0)|round(2) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gem fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('inventory') }}" class="small text-primary">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rough Inventory Stats Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Rough Inventory</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ rough_inventory_stats.get('total_items', 0) }} Items</div>
+                            <div class="text-muted small">{{ rough_inventory_stats.get('total_weight', 0)|round(2) }} Carats</div>
+                            <div class="text-muted small">₹{{ rough_inventory_stats.get('total_value', 0)|round(2) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-cubes fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ url_for('rough_inventory') }}" class="small text-success">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Stats Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Sales</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sales_stats.get('total_sales', 0) }} Transactions</div>
+                            <div class="text-muted small">${{ sales_stats.get('total_amount', 0)|round(2) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="small text-info">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchases Stats Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Purchases</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ purchase_stats.get('total_purchases', 0) }} Transactions</div>
+                            <div class="text-muted small">${{ purchase_stats.get('total_amount', 0)|round(2) }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="small text-warning">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Quick Actions Card -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('buy') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-shopping-cart me-2"></i>New Purchase
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="#" class="btn btn-success btn-block">
+                                <i class="fas fa-tags me-2"></i>New Sale
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="#" class="btn btn-info btn-block">
+                                <i class="fas fa-file-alt me-2"></i>View Records
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="#" class="btn btn-warning btn-block">
+                                <i class="fas fa-chart-bar me-2"></i>Generate Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Card -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-center text-muted py-5">
+                        <i class="fas fa-info-circle me-2"></i>Recent activity will be displayed here in future updates.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dashboard-specific JavaScript can be added here
+    });
+</script>
+{% endblock %} 

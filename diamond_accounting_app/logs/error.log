@@ -1,0 +1,213 @@
+2025-03-16 00:02:17,317 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250315_235942.zip'
+2025-03-16 00:02:17,319 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250315_235942.zip'
+
+2025-03-16 00:03:57,744 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000016.zip'
+2025-03-16 00:03:57,745 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000016.zip'
+
+2025-03-16 00:18:00,007 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000618.zip'
+2025-03-16 00:18:00,007 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000618.zip'
+2025-03-16 00:18:00,008 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000618.zip'
+
+2025-03-16 00:18:00,010 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000618.zip'
+
+2025-03-16 00:18:34,985 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000844.zip'
+2025-03-16 00:18:34,985 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000844.zip'
+2025-03-16 00:18:34,986 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000844.zip'
+
+2025-03-16 00:18:34,987 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_000844.zip'
+
+2025-03-16 00:20:54,198 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001759.zip'
+2025-03-16 00:20:54,200 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001759.zip'
+
+2025-03-16 00:21:23,015 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+2025-03-16 00:21:23,015 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+2025-03-16 00:21:23,015 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+2025-03-16 00:21:23,016 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+
+2025-03-16 00:21:23,017 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+
+2025-03-16 00:21:23,017 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_001800.zip'
+
+2025-03-16 00:33:27,368 - diamond_app - ERROR - Error creating backup: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_002743.zip'
+2025-03-16 00:33:27,369 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 222, in create_backup
+    backup_files = sorted([os.path.join(BACKUP_DIR, f) for f in os.listdir(BACKUP_DIR)
+                          if f.startswith('diamond_data_backup_') and f.endswith('.zip')],
+                         key=os.path.getmtime, reverse=True)
+  File "<frozen genericpath>", line 91, in getmtime
+FileNotFoundError: [WinError 2] The system cannot find the file specified: 'D:\\NV SOFTWARE BY CURSOR\\diamond_accounting_app\\data\\backup\\diamond_data_backup_20250316_002743.zip'
+
+2025-03-16 00:36:12,548 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 00:36:12,548 - diamond_app - ERROR - Request: / GET
+2025-03-16 00:36:12,550 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 00:36:12,550 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 1292, in index
+    return render_template('index.html')
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\index.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 19, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 00:38:02,534 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 00:38:02,535 - diamond_app - ERROR - Request: / GET
+2025-03-16 00:38:02,536 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 00:38:02,536 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 1292, in index
+    return render_template('index.html')
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\index.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 19, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+
+2025-03-16 00:45:09,549 - diamond_app - ERROR - Unhandled exception: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2025-03-16 00:45:09,550 - diamond_app - ERROR - Request: / GET
+2025-03-16 00:45:09,550 - diamond_app - ERROR - Form data: ImmutableMultiDict([])
+2025-03-16 00:45:09,551 - diamond_app - ERROR - Traceback: Traceback (most recent call last):
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\app.py", line 1292, in index
+    return render_template('index.html')
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\index.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "D:\NV SOFTWARE BY CURSOR\diamond_accounting_app\templates\base.html", line 19, in top-level template code
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+    ^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "d:\NV SOFTWARE BY CURSOR\.venv\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+

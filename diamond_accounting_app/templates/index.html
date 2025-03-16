@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Shree Dangigev Diamonds - Diamond Accounting{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center font-weight-light my-2">
+                    <i class="fas fa-gem me-2 text-white"></i>Welcome to Shree Dangigev Diamonds
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h4>Welcome to Shree Dangigev Diamonds Accounting System</h4>
+                    <p class="lead">Manage your diamond business transactions efficiently</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="card-icon text-primary">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <h5 class="card-title">Buy Diamonds</h5>
+                                <p class="card-text">Record new diamond purchases with complete details</p>
+                                <a href="{{ url_for('buy') }}" class="btn btn-primary">Record Purchase</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sell card commented out until route is implemented -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="card-icon text-success">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <h5 class="card-title">Sell Diamonds</h5>
+                                <p class="card-text">Record diamond sales with pricing and payment details</p>
+                                <a href="{{ url_for('sell') }}" class="btn btn-success">Record Sale</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="card-icon text-info">
+                                    <i class="fas fa-gem"></i>
+                                </div>
+                                <h5 class="card-title">Inventory</h5>
+                                <p class="card-text">Manage your diamond stock with detailed specifications</p>
+                                <a href="{{ url_for('inventory') }}" class="btn btn-info">View Inventory</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="card-icon text-warning">
+                                    <i class="fas fa-cubes"></i>
+                                </div>
+                                <h5 class="card-title">Rough Inventory</h5>
+                                <p class="card-text">Manage your rough diamond stock with detailed specifications</p>
+                                <a href="{{ url_for('rough_inventory') }}" class="btn btn-warning">View Rough Inventory</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard card commented out until route is implemented -->
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="card-icon text-secondary">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h5 class="card-title">Dashboard</h5>
+                                <p class="card-text">Analyze your business performance with visual reports</p>
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Additional cards commented out until routes are implemented
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-file-alt me-2 text-primary"></i>Transaction Records</h5>
+                                <p class="card-text">View, edit, and manage all your transaction records in one place.</p>
+                                <a href="{{ url_for('records') }}" class="btn btn-outline-primary">View Records</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Payments</h5>
+                                <p class="card-text">Track pending payments and manage your cash flow efficiently.</p>
+                                <a href="{{ url_for('payments') }}" class="btn btn-outline-primary">View Payments</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-chart-bar me-2 text-primary"></i>Business Reports</h5>
+                                <p class="card-text">Generate detailed reports for your diamond business activities.</p>
+                                <a href="{{ url_for('reports') }}" class="btn btn-outline-primary">View Reports</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

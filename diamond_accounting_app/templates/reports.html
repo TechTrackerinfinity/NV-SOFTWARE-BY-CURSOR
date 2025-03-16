@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}Business Reports - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Business Reports{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Reports</li>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-card {
+        transition: all 0.3s ease;
+    }
+    .report-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Business Reports</h6>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="daily-btn">Daily</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary active" id="monthly-btn">Monthly</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="yearly-btn">Yearly</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Business Overview Cards -->
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2 report-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Inventory Value</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">₹{{ report_data.get('total_inventory_value', 0)|format_currency }}</div>
+                                            <div class="text-muted small">{{ report_data.get('total_inventory_carats', 0)|round(2) }} Carats</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-gem fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2 report-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Rough Inventory Value</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">₹{{ report_data.get('total_rough_inventory_value', 0)|format_currency }}</div>
+                                            <div class="text-muted small">{{ report_data.get('total_rough_inventory_weight', 0)|round(2) }} Carats</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-cubes fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2 report-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Total Purchases</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ report_data.get('total_purchases', 0)|format_currency }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2 report-card">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Total Sales</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ report_data.get('total_sales', 0)|format_currency }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profit Margin Card -->
+                    <div class="row">
+                        <div class="col-xl-6 col-md-12 mb-4">
+                            <div class="card shadow mb-4 report-card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Profit Margin</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h4 class="small font-weight-bold">Profit Margin <span class="float-end">{{ report_data.get('profit_margin', 0)|round(2) }}%</span></h4>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-{{ 'danger' if report_data.get('profit_margin', 0) < 0 else 'warning' if report_data.get('profit_margin', 0) < 10 else 'success' }}" role="progressbar" style="width: {{ max(0, min(100, report_data.get('profit_margin', 0))) }}%" aria-valuenow="{{ report_data.get('profit_margin', 0)|round(2) }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <p class="text-muted">
+                                        {% if report_data.get('profit_margin', 0) > 0 %}
+                                        Your business is profitable with a margin of {{ report_data.get('profit_margin', 0)|round(2) }}%.
+                                        {% elif report_data.get('profit_margin', 0) < 0 %}
+                                        Your business is currently operating at a loss with a margin of {{ report_data.get('profit_margin', 0)|round(2) }}%.
+                                        {% else %}
+                                        No profit margin data available.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-6 col-md-12 mb-4">
+                            <div class="card shadow mb-4 report-card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Sales vs Purchases</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="salesPurchasesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Reports -->
+                    <div class="row">
+                        <div class="col-xl-4 col-md-12 mb-4">
+                            <div class="card shadow mb-4 report-card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Inventory Distribution</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="inventoryDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-4 col-md-12 mb-4">
+                            <div class="card shadow mb-4 report-card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Monthly Sales Trend</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="monthlySalesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-4 col-md-12 mb-4">
+                            <div class="card shadow mb-4 report-card">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Top Selling Items</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item</th>
+                                                    <th>Quantity</th>
+                                                    <th>Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in top_selling_items %}
+                                                <tr>
+                                                    <td>{{ item.name }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>₹{{ item.revenue|format_currency }}</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center">No data available</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Period selection
+        const dailyBtn = document.getElementById('daily-btn');
+        const monthlyBtn = document.getElementById('monthly-btn');
+        const yearlyBtn = document.getElementById('yearly-btn');
+        
+        dailyBtn.addEventListener('click', function() {
+            dailyBtn.classList.add('active');
+            monthlyBtn.classList.remove('active');
+            yearlyBtn.classList.remove('active');
+            // Update charts with daily data
+            updateCharts('daily');
+        });
+        
+        monthlyBtn.addEventListener('click', function() {
+            dailyBtn.classList.remove('active');
+            monthlyBtn.classList.add('active');
+            yearlyBtn.classList.remove('active');
+            // Update charts with monthly data
+            updateCharts('monthly');
+        });
+        
+        yearlyBtn.addEventListener('click', function() {
+            dailyBtn.classList.remove('active');
+            monthlyBtn.classList.remove('active');
+            yearlyBtn.classList.add('active');
+            // Update charts with yearly data
+            updateCharts('yearly');
+        });
+        
+        // Initialize charts
+        const salesPurchasesChart = new Chart(
+            document.getElementById('salesPurchasesChart'),
+            {
+                type: 'bar',
+                data: {
+                    labels: {{ report_data.get('months', [])|tojson }},
+                    datasets: [
+                        {
+                            label: 'Sales',
+                            data: {{ report_data.get('monthly_sales', [])|tojson }},
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Purchases',
+                            data: {{ report_data.get('monthly_purchases', [])|tojson }},
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            }
+        );
+        
+        const inventoryDistributionChart = new Chart(
+            document.getElementById('inventoryDistributionChart'),
+            {
+                type: 'pie',
+                data: {
+                    labels: {{ report_data.get('inventory_categories', [])|tojson }},
+                    datasets: [{
+                        data: {{ report_data.get('inventory_distribution', [])|tojson }},
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+        
+        const monthlySalesChart = new Chart(
+            document.getElementById('monthlySalesChart'),
+            {
+                type: 'line',
+                data: {
+                    labels: {{ report_data.get('months', [])|tojson }},
+                    datasets: [{
+                        label: 'Sales',
+                        data: {{ report_data.get('monthly_sales', [])|tojson }},
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            }
+        );
+        
+        function updateCharts(period) {
+            // This function would fetch new data based on the selected period
+            // and update the charts accordingly
+            console.log(`Updating charts with ${period} data`);
+            // In a real implementation, you would make an AJAX call to get new data
+            // and then update the charts
+        }
+    });
+</script>
+{% endblock %} 

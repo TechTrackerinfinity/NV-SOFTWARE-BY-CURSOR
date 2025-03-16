@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+
+{% block title %}Sell Diamonds - Shree Dangigev Diamonds{% endblock %}
+
+{% block page_title %}Sell Diamonds{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Sell</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Sell Diamonds</h6>
+            </div>
+            <div class="card-body">
+                    {% if success_message %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        {{ success_message }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Tabs for Polished and Rough Diamonds -->
+                    <ul class="nav nav-tabs mb-4" id="diamondTypeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="polished-tab" data-bs-toggle="tab" data-bs-target="#polished" type="button" role="tab" aria-controls="polished" aria-selected="true">
+                                <i class="fas fa-gem me-2"></i>Polished Diamond
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="rough-tab" data-bs-toggle="tab" data-bs-target="#rough" type="button" role="tab" aria-controls="rough" aria-selected="false">
+                                <i class="fas fa-cubes me-2"></i>Rough Diamond
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="diamondTypeTabsContent">
+                        <!-- Polished Diamond Tab -->
+                        <div class="tab-pane fade show active" id="polished" role="tabpanel" aria-labelledby="polished-tab">
+                            <form id="sellPolishedForm" action="{{ url_for('sell') }}" method="post">
+                                <input type="hidden" name="diamond_type" value="polished">
+                                
+                                <div class="row">
+                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="inventory_item" class="form-control-label">Select Polished Diamond <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="inventory_item" name="inventory_item" required>
+                                                <option value="">-- Select a polished diamond --</option>
+                                                {% for item in inventory_items %}
+                                                <option value="{{ item.id }}">
+                                                    {{ item.description }} - {{ item.shape }} {{ item.carats }}ct ({{ item.color }}/{{ item.clarity }}) - ₹{{ item.market_value|format_currency }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                            </div>
+                        </div>
+                                    
+                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="customer_name" class="form-control-label">Customer Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" id="customer_name" name="customer_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="reference_party" class="form-control-label">Reference Party</label>
+                                            <input class="form-control" type="text" id="reference_party" name="reference_party">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="sale_price" class="form-control-label">Sale Price (₹) <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="number" id="sale_price" name="sale_price" required>
+                                        </div>
+                    </div>
+                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="sale_date" class="form-control-label">Sale Date <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="date" id="sale_date" name="sale_date" value="{{ today_date }}" required>
+                                        </div>
+                            </div>
+                        </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="price_per_carat" class="form-control-label">Price Per Carat (₹)</label>
+                                            <input class="form-control" type="number" id="price_per_carat" name="price_per_carat" step="0.01">
+                            </div>
+                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="certificate_number" class="form-control-label">Certificate Number</label>
+                                            <input class="form-control" type="text" id="certificate_number" name="certificate_number">
+                            </div>
+                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="certificate_type" class="form-control-label">Certificate Type</label>
+                                            <select class="form-control" id="certificate_type" name="certificate_type">
+                                                <option value="">-- Select certificate type --</option>
+                                                <option value="GIA">GIA</option>
+                                                <option value="IGI">IGI</option>
+                                                <option value="HRD">HRD</option>
+                                                <option value="AGS">AGS</option>
+                                                <option value="None">None</option>
+                                            </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_status" class="form-control-label">Payment Status <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="payment_status" name="payment_status" required>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
+                    </div>
+                    </div>
+                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_days" class="form-control-label">Payment Days</label>
+                                            <input class="form-control" type="number" id="payment_days" name="payment_days" value="30">
+                            </div>
+                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="payment_due_date" class="form-control-label">Payment Due Date</label>
+                                            <input class="form-control" type="date" id="payment_due_date" name="payment_due_date">
+                            </div>
+                        </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="notes" class="form-control-label">Notes</label>
+                                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                <div class="row mt-4">
+                                    <div class="col-md-12 text-end">
+                                        <a href="{{ url_for('inventory') }}" class="btn btn-secondary">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-check-circle me-2"></i>Complete Sale
+                                        </button>
+                            </div>
+                        </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Rough Diamond Tab -->
+                        <div class="tab-pane fade" id="rough" role="tabpanel" aria-labelledby="rough-tab">
+                            <form id="sellRoughForm" action="{{ url_for('sell') }}" method="post">
+                                <input type="hidden" name="diamond_type" value="rough">
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="rough_inventory_item" class="form-control-label">Select Rough Diamond <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="rough_inventory_item" name="rough_inventory_item" required>
+                                                <option value="">-- Select a rough diamond --</option>
+                                                {% for item in rough_inventory_items %}
+                                                <option value="{{ item.id }}">
+                                                    {{ item.description }} - {{ item.weight }}ct - Rough ID: {{ item.rough_id }} - ₹{{ item.purchase_price|format_currency }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                        </div>
+                    </div>
+                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="rough_customer_name" class="form-control-label">Customer Name <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" id="rough_customer_name" name="customer_name" required>
+                    </div>
+                            </div>
+                        </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_reference_party" class="form-control-label">Reference Party</label>
+                                            <input class="form-control" type="text" id="rough_reference_party" name="reference_party">
+                            </div>
+                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_sale_price" class="form-control-label">Sale Price (₹) <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="number" id="rough_sale_price" name="sale_price" required>
+                            </div>
+                        </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_sale_date" class="form-control-label">Sale Date <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="date" id="rough_sale_date" name="sale_date" value="{{ today_date }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_price_per_carat" class="form-control-label">Price Per Carat (₹)</label>
+                                            <input class="form-control" type="number" id="rough_price_per_carat" name="price_per_carat" step="0.01">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_destination" class="form-control-label">Destination</label>
+                                            <input class="form-control" type="text" id="rough_destination" name="destination">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_purpose" class="form-control-label">Purpose</label>
+                                            <select class="form-control" id="rough_purpose" name="purpose">
+                                                <option value="">-- Select purpose --</option>
+                                                <option value="Cutting">Cutting</option>
+                                                <option value="Resale">Resale</option>
+                                                <option value="Export">Export</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_payment_status" class="form-control-label">Payment Status <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="rough_payment_status" name="payment_status" required>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_payment_days" class="form-control-label">Payment Days</label>
+                                            <input class="form-control" type="number" id="rough_payment_days" name="payment_days" value="30">
+                                        </div>
+                    </div>
+                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="rough_payment_due_date" class="form-control-label">Payment Due Date</label>
+                                            <input class="form-control" type="date" id="rough_payment_due_date" name="payment_due_date">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="rough_notes" class="form-control-label">Notes</label>
+                                            <textarea class="form-control" id="rough_notes" name="notes" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-12 text-end">
+                                        <a href="{{ url_for('rough_inventory') }}" class="btn btn-secondary">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-check-circle me-2"></i>Complete Sale
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Initialize both forms
+        initializePolishedSellForm();
+        initializeRoughSellForm();
+        
+        // Handle tab switching
+        const diamondTypeTabs = document.getElementById('diamondTypeTabs');
+        if (diamondTypeTabs) {
+            const tabs = diamondTypeTabs.querySelectorAll('.nav-link');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Reset forms when switching tabs
+                    if (this.id === 'polished-tab') {
+                        initializePolishedSellForm();
+                    } else if (this.id === 'rough-tab') {
+                        initializeRoughSellForm();
+                    }
+                });
+            });
+        }
+    });
+    
+    // Function to initialize polished diamond sell form
+    function initializePolishedSellForm() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Set today's date
+        const saleDateInput = document.getElementById('sale_date');
+        if (saleDateInput) saleDateInput.value = today;
+        
+        // Setup inventory item selection
+        setupInventoryItemSelection();
+        
+        // Setup payment days calculation
+        setupPaymentDaysCalculation();
+        
+        // Setup payment status handling
+        setupPaymentStatusHandling();
+        
+        // Form validation
+        setupFormValidation('sellPolishedForm');
+    }
+    
+    // Function to initialize rough diamond sell form
+    function initializeRoughSellForm() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Set today's date
+        const roughSaleDateInput = document.getElementById('rough_sale_date');
+        if (roughSaleDateInput) roughSaleDateInput.value = today;
+        
+        // Setup rough inventory item selection
+        setupRoughInventoryItemSelection();
+        
+        // Setup payment days calculation for rough
+        setupRoughPaymentDaysCalculation();
+        
+        // Setup payment status handling for rough
+        setupRoughPaymentStatusHandling();
+        
+        // Form validation
+        setupFormValidation('sellRoughForm');
+    }
+    
+    // Function to setup inventory item selection
+    function setupInventoryItemSelection() {
+        const inventoryItemSelect = document.getElementById('inventory_item');
+        const pricePerCaratInput = document.getElementById('price_per_carat');
+        const salePriceInput = document.getElementById('sale_price');
+        
+        if (inventoryItemSelect && pricePerCaratInput && salePriceInput) {
+            inventoryItemSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    // Extract carat and price information from the option text
+                    const optionText = selectedOption.text;
+                    const caratMatch = optionText.match(/(\d+\.\d+)ct/);
+                    const priceMatch = optionText.match(/₹([\d,]+(\.\d+)?)/);
+                    
+                    if (caratMatch && priceMatch) {
+                        const carat = parseFloat(caratMatch[1]);
+                        // Remove commas and convert to number
+                        const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+                        
+                        if (!isNaN(carat) && !isNaN(price)) {
+                            // Calculate price per carat
+                            const pricePerCarat = price / carat;
+                            pricePerCaratInput.value = pricePerCarat.toFixed(2);
+                            
+                            // Set suggested sale price (10% markup)
+                            salePriceInput.value = (price * 1.1).toFixed(2);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    // Function to setup rough inventory item selection
+    function setupRoughInventoryItemSelection() {
+        const roughInventoryItemSelect = document.getElementById('rough_inventory_item');
+        const roughPricePerCaratInput = document.getElementById('rough_price_per_carat');
+        const roughSalePriceInput = document.getElementById('rough_sale_price');
+        
+        if (roughInventoryItemSelect && roughPricePerCaratInput && roughSalePriceInput) {
+            roughInventoryItemSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    // Extract weight and price information from the option text
+                    const optionText = selectedOption.text;
+                    const weightMatch = optionText.match(/(\d+\.\d+)ct/);
+                    const priceMatch = optionText.match(/₹([\d,]+(\.\d+)?)/);
+                    
+                    if (weightMatch && priceMatch) {
+                        const weight = parseFloat(weightMatch[1]);
+                        // Remove commas and convert to number
+                        const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+                        
+                        if (!isNaN(weight) && !isNaN(price)) {
+                            // Calculate price per carat
+                            const pricePerCarat = price / weight;
+                            roughPricePerCaratInput.value = pricePerCarat.toFixed(2);
+                            
+                            // Set suggested sale price (15% markup for rough)
+                            roughSalePriceInput.value = (price * 1.15).toFixed(2);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    // Function to setup payment days calculation
+    function setupPaymentDaysCalculation() {
+        const saleDateInput = document.getElementById('sale_date');
+        const paymentDaysInput = document.getElementById('payment_days');
+        const paymentDueDateInput = document.getElementById('payment_due_date');
+        
+        if (saleDateInput && paymentDaysInput && paymentDueDateInput) {
+        paymentDaysInput.addEventListener('input', function() {
+                if (this.value && saleDateInput.value) {
+                    const saleDate = new Date(saleDateInput.value);
+                    const dueDate = new Date(saleDate);
+                    dueDate.setDate(saleDate.getDate() + parseInt(this.value));
+                paymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+            }
+        });
+        
+            saleDateInput.addEventListener('change', function() {
+            if (paymentDaysInput.value && this.value) {
+                    const saleDate = new Date(this.value);
+                    const dueDate = new Date(saleDate);
+                    dueDate.setDate(saleDate.getDate() + parseInt(paymentDaysInput.value));
+                paymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+            }
+        });
+        
+        paymentDueDateInput.addEventListener('change', function() {
+                if (this.value && saleDateInput.value) {
+                    const saleDate = new Date(saleDateInput.value);
+                const dueDate = new Date(this.value);
+                    const diffTime = dueDate - saleDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays > 0) {
+                    paymentDaysInput.value = diffDays;
+                }
+            }
+        });
+        
+            // Calculate initial payment due date
+            if (saleDateInput.value && paymentDaysInput.value) {
+                const saleDate = new Date(saleDateInput.value);
+                const dueDate = new Date(saleDate);
+                dueDate.setDate(saleDate.getDate() + parseInt(paymentDaysInput.value));
+                paymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+            }
+        }
+    }
+    
+    // Function to setup rough payment days calculation
+    function setupRoughPaymentDaysCalculation() {
+        const roughSaleDateInput = document.getElementById('rough_sale_date');
+        const roughPaymentDaysInput = document.getElementById('rough_payment_days');
+        const roughPaymentDueDateInput = document.getElementById('rough_payment_due_date');
+        
+        if (roughSaleDateInput && roughPaymentDaysInput && roughPaymentDueDateInput) {
+            roughPaymentDaysInput.addEventListener('input', function() {
+                if (this.value && roughSaleDateInput.value) {
+                    const saleDate = new Date(roughSaleDateInput.value);
+                    const dueDate = new Date(saleDate);
+                    dueDate.setDate(saleDate.getDate() + parseInt(this.value));
+                    roughPaymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+                }
+            });
+            
+            roughSaleDateInput.addEventListener('change', function() {
+                if (roughPaymentDaysInput.value && this.value) {
+                    const saleDate = new Date(this.value);
+                    const dueDate = new Date(saleDate);
+                    dueDate.setDate(saleDate.getDate() + parseInt(roughPaymentDaysInput.value));
+                    roughPaymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+                }
+            });
+            
+            roughPaymentDueDateInput.addEventListener('change', function() {
+                if (this.value && roughSaleDateInput.value) {
+                    const saleDate = new Date(roughSaleDateInput.value);
+                    const dueDate = new Date(this.value);
+                    const diffTime = dueDate - saleDate;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays > 0) {
+                        roughPaymentDaysInput.value = diffDays;
+                    }
+                }
+            });
+            
+            // Calculate initial payment due date
+            if (roughSaleDateInput.value && roughPaymentDaysInput.value) {
+                const saleDate = new Date(roughSaleDateInput.value);
+                const dueDate = new Date(saleDate);
+                dueDate.setDate(saleDate.getDate() + parseInt(roughPaymentDaysInput.value));
+                roughPaymentDueDateInput.value = dueDate.toISOString().split('T')[0];
+            }
+        }
+    }
+    
+    // Function to setup payment status handling
+    function setupPaymentStatusHandling() {
+        const paymentStatusSelect = document.getElementById('payment_status');
+        
+        if (paymentStatusSelect) {
+            paymentStatusSelect.addEventListener('change', function() {
+                // You can add additional logic here if needed
+            });
+        }
+    }
+    
+    // Function to setup rough payment status handling
+    function setupRoughPaymentStatusHandling() {
+        const roughPaymentStatusSelect = document.getElementById('rough_payment_status');
+        
+        if (roughPaymentStatusSelect) {
+            roughPaymentStatusSelect.addEventListener('change', function() {
+                // You can add additional logic here if needed
+            });
+        }
+    }
+    
+    // Function to setup form validation
+    function setupFormValidation(formId) {
+        const form = document.getElementById(formId);
+        
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                let isValid = true;
+                
+                // Get form-specific elements
+                const prefix = formId === 'sellPolishedForm' ? '' : 'rough_';
+                
+                // Validate inventory item
+                const inventoryItemSelect = document.getElementById(`${prefix}inventory_item`);
+                if (inventoryItemSelect && !inventoryItemSelect.value) {
+                    inventoryItemSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else if (inventoryItemSelect) {
+                    inventoryItemSelect.classList.remove('is-invalid');
+                }
+                
+                // Validate customer name
+                const customerNameInput = document.getElementById(`${prefix}customer_name`);
+                if (customerNameInput && !customerNameInput.value.trim()) {
+                    customerNameInput.classList.add('is-invalid');
+                    isValid = false;
+                } else if (customerNameInput) {
+                    customerNameInput.classList.remove('is-invalid');
+                }
+                
+                // Validate sale price
+                const salePriceInput = document.getElementById(`${prefix}sale_price`);
+                if (salePriceInput && (!salePriceInput.value || parseFloat(salePriceInput.value) <= 0)) {
+                    salePriceInput.classList.add('is-invalid');
+                    isValid = false;
+                } else if (salePriceInput) {
+                    salePriceInput.classList.remove('is-invalid');
+                }
+                
+                // Validate sale date
+                const saleDateInput = document.getElementById(`${prefix}sale_date`);
+                if (saleDateInput && !saleDateInput.value) {
+                    saleDateInput.classList.add('is-invalid');
+                    isValid = false;
+                } else if (saleDateInput) {
+                    saleDateInput.classList.remove('is-invalid');
+                }
+                
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+            
+            // Clear validation errors on input
+            const inputs = form.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+        }
+    }
+</script>
+{% endblock %} 

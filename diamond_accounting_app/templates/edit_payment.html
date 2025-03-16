@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Payment - Shree Dangigev Diamonds{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6>Edit Payment</h6>
+                        <a href="{{ url_for('payments') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i> Back to Payments
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_payment', payment_id=payment.id) }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="text-uppercase text-secondary font-weight-bolder">Basic Information</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" class="form-control" name="name" value="{{ payment.name }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Payment Date</label>
+                                            <input type="date" class="form-control" name="payment_date" 
+                                                   value="{{ payment.payment_date.strftime('%Y-%m-%d') }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Payment Method</label>
+                                            <select class="form-select" name="payment_method" required>
+                                                <option value="cash" {% if payment.payment_method == 'cash' %}selected{% endif %}>Cash</option>
+                                                <option value="bank" {% if payment.payment_method == 'bank' %}selected{% endif %}>Bank Transfer</option>
+                                                <option value="cheque" {% if payment.payment_method == 'cheque' %}selected{% endif %}>Cheque</option>
+                                                <option value="upi" {% if payment.payment_method == 'upi' %}selected{% endif %}>UPI</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="text-uppercase text-secondary font-weight-bolder">Payment Amounts</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Total Amount</label>
+                                            <input type="number" class="form-control" value="{{ payment.total_amount }}" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Paid Amount</label>
+                                            <input type="number" class="form-control" name="paid_amount" 
+                                                   value="{{ payment.paid_amount }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Pending Amount</label>
+                                            <input type="number" class="form-control" value="{{ payment.pending_amount }}" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <input type="text" class="form-control" value="{{ payment.status }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="text-uppercase text-secondary font-weight-bolder">Notes</h6>
+                                        <div class="mb-3">
+                                            <textarea class="form-control" name="notes" rows="3">{{ payment.notes }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const totalAmount = parseFloat('{{ payment.total_amount }}');
+    const paidAmountInput = document.querySelector('input[name="paid_amount"]');
+    
+    paidAmountInput.addEventListener('input', function() {
+        const paidAmount = parseFloat(this.value) || 0;
+        const pendingAmount = totalAmount - paidAmount;
+        document.querySelector('input[value="{{ payment.pending_amount }}"]').value = pendingAmount.toFixed(2);
+        
+        // Update status based on amounts
+        const statusInput = document.querySelector('input[value="{{ payment.status }}"]');
+        if (pendingAmount <= 0) {
+            statusInput.value = 'completed';
+        } else if (paidAmount > 0) {
+            statusInput.value = 'partial';
+        } else {
+            statusInput.value = 'pending';
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 
